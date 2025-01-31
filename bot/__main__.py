@@ -10,10 +10,15 @@ from api.config.logging import LOGGING
 from bot.config.bot import RUNNING_MODE, TELEGRAM_API_TOKEN, RunningMode
 from bot.handlers import router
 
+# FOR INITIAL CREATION OF DATABASE
+from asgiref.sync import sync_to_async
+from api.user.models import BotText
+
+# LOGGING
 logging.config.dictConfig(LOGGING)
 logger = logging.getLogger(__name__)
 
-bot = Bot(TELEGRAM_API_TOKEN, parse_mode="HTML")
+bot = Bot(TELEGRAM_API_TOKEN)
 
 dispatcher = Dispatcher()
 dispatcher.include_router(router)
@@ -22,15 +27,30 @@ dispatcher.include_router(router)
 async def set_bot_commands() -> None:
     await bot.set_my_commands(
         [
-            BotCommand(command="/start", description="Register the bot"),
-            BotCommand(command="/id", description="Get the user and chat ids"),
+            BotCommand(command="/start", description="Start the bot!"),
         ],
     )
+
+
+async def create_all_default_bot_texts() -> None:
+    try:
+        # start pain text
+        try:
+            q = await BotText.objects.aget(name='start_text_pain')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="start_text_pain", text="Опишите мне вашу боль",
+            )
+    except Exception as e:
+        logging.error(f"Error while creating default bot texts: {e}")
 
 
 @dispatcher.startup()
 async def on_startup() -> None:
     await set_bot_commands()
+    
+    # CREATION OF DEFAULT BOT TEXTS
+    await create_all_default_bot_texts()
 
 
 def run_polling() -> None:

@@ -103,7 +103,7 @@ services:
 
   migrations:
     build: .
-    command: make migrate
+    command: make makemigrations && make migrate
     depends_on:
       - db
     volumes:

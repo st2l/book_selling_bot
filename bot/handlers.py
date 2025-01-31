@@ -7,6 +7,8 @@ from aiogram.filters import Command
 
 from api.user.models import User
 
+from utils import get_bot_text
+
 if TYPE_CHECKING:
     from aiogram.types import Message
 
@@ -26,11 +28,8 @@ async def handle_start_command(message: Message) -> None:
             "last_name": message.from_user.last_name,
         },
     )
-
-    if is_new:
-        await message.answer("You have successfully registered in the bot!")
-    else:
-        await message.answer("You are already registered in the bot!")
+        
+    await message.answer(text=await get_bot_text(name='start_text_pain'))
 
 
 @router.message(Command(commands=["id"]))
