@@ -9,6 +9,7 @@ from aiogram.types import BotCommand
 from api.config.logging import LOGGING
 from bot.config.bot import RUNNING_MODE, TELEGRAM_API_TOKEN, RunningMode
 from bot.handlers import router
+from bot.short_methodics_handler import short_methodics_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -22,6 +23,7 @@ bot = Bot(TELEGRAM_API_TOKEN)
 
 dispatcher = Dispatcher()
 dispatcher.include_router(router)
+dispatcher.include_router(short_methodics_router)
 
 
 async def set_bot_commands() -> None:
@@ -41,6 +43,23 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="start_text_pain", text="Опишите мне вашу боль",
             )
+
+        # Выделение боли и уточняющий вопрос
+        try:
+            q = await BotText.objects.aget(name='Выделение боли и уточняющий вопрос')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Выделение боли и уточняющий вопрос", text="О да... {}... Я правильно понял, что ты хочешь решить {}?",
+            )
+
+        # Стартовое сообщение и рекомендацию по использованию подписки
+        try:
+            q = await BotText.objects.aget(name='Стартовое сообщение и рекомендацию по использованию подписки')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Стартовое сообщение и рекомендацию по использованию подписки",
+                text="Предлагаю тебе выбрать способ решения, но прежде чем выбрать прочти до конца. (Краткая рекомендация по использованию подпиской)",
+            )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
 
@@ -48,7 +67,7 @@ async def create_all_default_bot_texts() -> None:
 @dispatcher.startup()
 async def on_startup() -> None:
     await set_bot_commands()
-    
+
     # CREATION OF DEFAULT BOT TEXTS
     await create_all_default_bot_texts()
 
