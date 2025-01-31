@@ -8,7 +8,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
 from api.user.models import User
-from bot.keyboard import main_menu
+from bot.keyboard import short_methodics_keyboard
 
 from utils import get_bot_text, identify_user
 
@@ -20,11 +20,11 @@ short_methodics_router = Router()
 
 @short_methodics_router.callback_query(F.data == 'short_methodics')
 async def short_methodics_handler(call: CallbackQuery):
-    user = await identify_user(call.from_user.id)
+    user = await identify_user(call)
 
     await call.message.edit_text(
-        text='Краткая методичка',
-        reply_markup=await main_menu(user)
+        text=await get_bot_text(name='Краткая информация для краткой методички'),
+        reply_markup=await short_methodics_keyboard()
     )
 
     await call.answer()

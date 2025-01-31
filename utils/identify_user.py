@@ -1,8 +1,8 @@
 from api.user.models import User
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 
-async def identify_user(message: Message):
+async def identify_user(message: Message | CallbackQuery):
     user, is_new = await User.objects.aget_or_create(
         pk=message.from_user.id,
         defaults={

@@ -60,6 +60,15 @@ async def create_all_default_bot_texts() -> None:
                 name="Стартовое сообщение и рекомендацию по использованию подписки",
                 text="Предлагаю тебе выбрать способ решения, но прежде чем выбрать прочти до конца. (Краткая рекомендация по использованию подпиской)",
             )
+        
+        # Краткая информация для краткой методички
+        try:
+            q = await BotText.objects.aget(name='Краткая информация для краткой методички')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Краткая информация для краткой методички",
+                text="Эта краткая методичка поможет вам решить вашу боль!",
+            )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
 
