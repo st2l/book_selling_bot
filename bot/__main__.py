@@ -8,8 +8,11 @@ from aiogram.types import BotCommand
 
 from api.config.logging import LOGGING
 from bot.config.bot import RUNNING_MODE, TELEGRAM_API_TOKEN, RunningMode
+
+# ROUTERS
 from bot.handlers import router
 from bot.short_methodics_handler import short_methodics_router
+from bot.main_menu import main_menu_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -24,6 +27,7 @@ bot = Bot(TELEGRAM_API_TOKEN)
 dispatcher = Dispatcher()
 dispatcher.include_router(router)
 dispatcher.include_router(short_methodics_router)
+dispatcher.include_router(main_menu_router)
 
 
 async def set_bot_commands() -> None:
@@ -60,7 +64,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Стартовое сообщение и рекомендацию по использованию подписки",
                 text="Предлагаю тебе выбрать способ решения, но прежде чем выбрать прочти до конца. (Краткая рекомендация по использованию подпиской)",
             )
-        
+
         # Краткая информация для краткой методички
         try:
             q = await BotText.objects.aget(name='Краткая информация для краткой методички')
@@ -68,6 +72,15 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Краткая информация для краткой методички",
                 text="Эта краткая методичка поможет вам решить вашу боль!",
+            )
+
+        # Главное меню
+        try:
+            q = await BotText.objects.aget(name='Главное меню')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Главное меню",
+                text="Главное меню",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
