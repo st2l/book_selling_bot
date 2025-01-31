@@ -48,7 +48,7 @@ class ShortMethodic(models.Model):
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()
-    material = models.FileField(upload_to="short_methodics/")
+    material = models.FileField(upload_to="short_methodics/", null=True)
 
     def __str__(self):
         return self.name

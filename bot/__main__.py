@@ -82,8 +82,41 @@ async def create_all_default_bot_texts() -> None:
                 name="Главное меню",
                 text="Главное меню",
             )
+
+        # Оплата краткой методички
+        try:
+            q = await BotText.objects.aget(name='Оплата краткой методички')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Оплата краткой методички",
+                text="Оплатите краткую методичку удобным вам способом!",
+            )
+        
+        # Краткая методичка куплена успешно
+        try:
+            q = await BotText.objects.aget(name='Краткая методичка куплена успешно')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Краткая методичка куплена успешно",
+                text="Краткая методичка куплена успешно!",  
+            )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
+
+
+async def create_short_methodic_default():
+    try:
+        from api.user.models import ShortMethodic
+        try:
+            q = await ShortMethodic.objects.aget(name='Краткая методичка')
+        except:
+            await ShortMethodic.objects.acreate(
+                name='Краткая методичка',
+                price=100,
+                description='Краткая методичка для решения вашей боли',
+            )
+    except Exception as e:
+        logging.error(f"Error while creating default short methodic: {e}")
 
 
 @dispatcher.startup()
@@ -92,6 +125,9 @@ async def on_startup() -> None:
 
     # CREATION OF DEFAULT BOT TEXTS
     await create_all_default_bot_texts()
+
+    # CREATION OF DEFAULT SHORT METHODIC
+    await create_short_methodic_default()
 
 
 def run_polling() -> None:
