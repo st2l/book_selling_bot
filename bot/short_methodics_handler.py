@@ -17,10 +17,14 @@ if TYPE_CHECKING:
 
 short_methodics_router = Router()
 
+
 @short_methodics_router.callback_query(F.data == 'short_methodics')
 async def short_methodics_handler(call: CallbackQuery):
     user = await identify_user(call.from_user.id)
 
-    await call.message.edit_text(text='Краткая методичка', reply_markup=await main_menu(user))
+    await call.message.edit_text(
+        text='Краткая методичка',
+        reply_markup=await main_menu(user)
+    )
 
     await call.answer()
