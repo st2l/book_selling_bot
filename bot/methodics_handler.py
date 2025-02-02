@@ -10,7 +10,7 @@ from aiogram.fsm.context import FSMContext
 
 from api.user.models import User, Methodic, History
 from bot.keyboard import choose_three_methodics_keyboard, methodic_1_keyboard, \
-    back_to_main_keyboard
+    back_to_main_keyboard, methodic_2_keyboard, methodic_3_keyboard
 
 from utils import get_bot_text, identify_user
 
@@ -34,12 +34,16 @@ async def methodics_handler(call: CallbackQuery):
 
     await call.answer()
 
+# ########################################################
+# #### Methodic 1 ########################################
+# ########################################################
+
 
 @methodics_router.callback_query(F.data == 'methodic_1')
 async def methodic_1_handler(call: CallbackQuery):
     user = await identify_user(call)
 
-    methodic = await Methodic.objects.aget(id=1)
+    methodic = await Methodic.objects.aget(name='Методичка 1')
 
     await call.message.edit_text(
         text=methodic.description,
@@ -67,6 +71,8 @@ async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
         prices=[
             LabeledPrice(label=methodic.name, amount=methodic.price * 100)
         ],
+        need_email=True,
+        send_email_to_provider=True,
         start_parameter='create_invoice',
     )
 
@@ -98,3 +104,145 @@ async def process_successful_payment(message: Message, state: FSMContext):
         reply_markup=await back_to_main_keyboard()
     )
     await state.clear()
+
+
+# ########################################################
+# #### Methodic 2 ########################################
+# ########################################################
+@methodics_router.callback_query(F.data == 'methodic_2')
+async def methodic_1_handler(call: CallbackQuery):
+    user = await identify_user(call)
+
+    methodic = await Methodic.objects.aget(name='Методичка 2')
+
+    await call.message.edit_text(
+        text=methodic.description,
+        reply_markup=await methodic_2_keyboard()
+    )
+
+    await call.answer()
+
+
+@methodics_router.callback_query(F.data == "methodic_2_purchase")
+async def methodic_2_purchase(call: CallbackQuery, state: FSMContext):
+
+    await call.answer()
+
+    methodic = await Methodic.objects.aget(name='Методичка 2')
+    logging.info(f"Methodic: {methodic}")
+
+    await call.bot.send_invoice(
+        chat_id=call.from_user.id,
+        title=methodic.name,
+        description='Покупка методички №2',
+        payload='bot_paid',
+        provider_token=os.getenv('YOOKASSA_TOKEN'),
+        currency='RUB',
+        prices=[
+            LabeledPrice(label=methodic.name, amount=methodic.price * 100)
+        ],
+        need_email=True,
+        send_email_to_provider=True,
+        start_parameter='create_invoice',
+    )
+
+    await state.set_state(MethodicsStates.methodics_yookassa)
+    await state.update_data(methodic_name=methodic.name)
+
+
+@methodics_router.pre_checkout_query()
+async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
+    await pre_checkout_query.answer(ok=True)
+
+
+@methodics_router.message(F.successful_payment, MethodicsStates.methodics_yookassa)
+async def process_successful_payment(message: Message, state: FSMContext):
+    data = await state.get_data()
+    methodic_name = data.get('methodic_name')
+
+    user, _ = await identify_user(message)
+    methodic = await Methodic.objects.aget(name=methodic_name)
+
+    await History.objects.acreate(
+        user=user,
+        methodic=methodic,
+    )
+
+    await message.answer_document(
+        caption=await get_bot_text("Методичка куплена успешно"),
+        document=FSInputFile(methodic.material.path),
+        reply_markup=await back_to_main_keyboard()
+    )
+    await state.clear()
+
+
+# ########################################################
+# #### Methodic 3 ########################################
+# ########################################################
+@methodics_router.callback_query(F.data == 'methodic_3')
+async def methodic_3_handler(call: CallbackQuery):
+    user = await identify_user(call)
+
+    methodic = await Methodic.objects.aget(name='Методичка 3')
+
+    await call.message.edit_text(
+        text=methodic.description,
+        reply_markup=await methodic_3_keyboard()
+    )
+
+    await call.answer()
+
+
+@methodics_router.callback_query(F.data == "methodic_3_purchase")
+async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
+
+    await call.answer()
+
+    methodic = await Methodic.objects.aget(name='Методичка 3')
+    logging.info(f"Methodic: {methodic}")
+
+    await call.bot.send_invoice(
+        chat_id=call.from_user.id,
+        title=methodic.name,
+        description='Покупка методички №3',
+        payload='bot_paid',
+        provider_token=os.getenv('YOOKASSA_TOKEN'),
+        currency='RUB',
+        prices=[
+            LabeledPrice(label=methodic.name, amount=methodic.price * 100)
+        ],
+        need_email=True,
+        send_email_to_provider=True,
+        start_parameter='create_invoice',
+    )
+
+    await state.set_state(MethodicsStates.methodics_yookassa)
+    await state.update_data(methodic_name=methodic.name)
+
+
+@methodics_router.pre_checkout_query()
+async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
+    await pre_checkout_query.answer(ok=True)
+
+
+@methodics_router.message(F.successful_payment, MethodicsStates.methodics_yookassa)
+async def process_successful_payment(message: Message, state: FSMContext):
+    data = await state.get_data()
+    methodic_name = data.get('methodic_name')
+
+    user, _ = await identify_user(message)
+    methodic = await Methodic.objects.aget(name=methodic_name)
+
+    await History.objects.acreate(
+        user=user,
+        methodic=methodic,
+    )
+
+    await message.answer_document(
+        caption=await get_bot_text("Методичка куплена успешно"),
+        document=FSInputFile(methodic.material.path),
+        reply_markup=await back_to_main_keyboard()
+    )
+    await state.clear()
+
+
