@@ -38,3 +38,11 @@ async def methodic_3_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="🔙 Назад", callback_data="methodics")],
     ])
     return keyboard
+
+async def methodic_all_keyboard() -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(
+            text="💵 Купить все", callback_data="methodic_all_purchase")],
+        [InlineKeyboardButton(text="🔙 Назад", callback_data="methodics")],
+    ])
+    return keyboard
