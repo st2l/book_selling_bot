@@ -20,7 +20,7 @@ main_menu_router = Router()
 
 @main_menu_router.callback_query(F.data == 'main_menu')
 async def main_menu_handler(call: CallbackQuery):
-    user = await identify_user(call)
+    user, _ = await identify_user(call)
 
     try:
         await call.message.edit_text(

@@ -15,6 +15,7 @@ from bot.short_methodics_handler import short_methodics_router
 from bot.main_menu import main_menu_router
 from bot.methodics_handler import methodics_router
 from bot.book_handler import book_router
+from bot.help_handler import help_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -32,6 +33,7 @@ dispatcher.include_router(short_methodics_router)
 dispatcher.include_router(main_menu_router)
 dispatcher.include_router(methodics_router)
 dispatcher.include_router(book_router)
+dispatcher.include_router(help_router)
 
 
 async def set_bot_commands() -> None:
@@ -139,6 +141,15 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Успешная покупка книги",
                 text="Успешная покупка книги!!",
+            )
+        
+        # Помощь
+        try:
+            q = await BotText.objects.aget(name='Помощь')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Помощь",
+                text="Помощь текст!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
