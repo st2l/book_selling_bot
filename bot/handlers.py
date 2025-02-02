@@ -32,14 +32,7 @@ async def handle_start_command(message: Message, state: FSMContext) -> None:
     if message.from_user is None:
         return
 
-    user, is_new = await User.objects.aget_or_create(
-        pk=message.from_user.id,
-        defaults={
-            "username": message.from_user.username,
-            "first_name": message.from_user.first_name,
-            "last_name": message.from_user.last_name,
-        },
-    )
+    user, is_new = await identify_user(message)
 
     # TODO: ADD usage of is_new variable
     await message.answer(text=await get_bot_text(name='start_text_pain'))
