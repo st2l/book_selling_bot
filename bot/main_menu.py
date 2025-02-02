@@ -22,9 +22,15 @@ main_menu_router = Router()
 async def main_menu_handler(call: CallbackQuery):
     user = await identify_user(call)
 
-    await call.message.edit_text(
-        text=await get_bot_text(name='Главное меню'),
-        reply_markup=await main_menu(user)
-    )
+    try:
+        await call.message.edit_text(
+            text=await get_bot_text(name='Главное меню'),
+            reply_markup=await main_menu(user)
+        )
+    except Exception as e:
+        await call.message.answer(
+            text=await get_bot_text(name='Главное меню'),
+            reply_markup=await main_menu(user)
+        )
 
     await call.answer()

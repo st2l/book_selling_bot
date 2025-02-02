@@ -13,6 +13,7 @@ from bot.config.bot import RUNNING_MODE, TELEGRAM_API_TOKEN, RunningMode
 from bot.handlers import router
 from bot.short_methodics_handler import short_methodics_router
 from bot.main_menu import main_menu_router
+from bot.methodics_handler import methodics_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -28,6 +29,7 @@ dispatcher = Dispatcher()
 dispatcher.include_router(router)
 dispatcher.include_router(short_methodics_router)
 dispatcher.include_router(main_menu_router)
+dispatcher.include_router(methodics_router)
 
 
 async def set_bot_commands() -> None:
@@ -91,14 +93,32 @@ async def create_all_default_bot_texts() -> None:
                 name="Оплата краткой методички",
                 text="Оплатите краткую методичку удобным вам способом!",
             )
-        
+
         # Краткая методичка куплена успешно
         try:
             q = await BotText.objects.aget(name='Краткая методичка куплена успешно')
         except:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Краткая методичка куплена успешно",
-                text="Краткая методичка куплена успешно!",  
+                text="Краткая методичка куплена успешно!",
+            )
+
+        # Информация для методичек
+        try:
+            q = await BotText.objects.aget(name='Информация для методичек')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Информация для методичек",
+                text="Информация для методичек!!",
+            )
+        
+        # Методичка куплена успешно
+        try:
+            q = await BotText.objects.aget(name='Методичка куплена успешно')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Методичка куплена успешно",
+                text="Методичка куплена успешно!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
@@ -119,6 +139,39 @@ async def create_short_methodic_default():
         logging.error(f"Error while creating default short methodic: {e}")
 
 
+async def create_methodic_default():
+    try:
+        from api.user.models import Methodic
+        try:
+            q = await Methodic.objects.aget(name='Методичка 1')
+        except:
+            await Methodic.objects.acreate(
+                name='Методичка 1',
+                price=200,
+                description='Методичка для решения вашей боли',
+            )
+
+        try:
+            q = await Methodic.objects.aget(name='Методичка 2')
+        except:
+            await Methodic.objects.acreate(
+                name='Методичка 2',
+                price=200,
+                description='Методичка для решения вашей боли 2',
+            )
+
+        try:
+            q = await Methodic.objects.aget(name='Методичка 3')
+        except:
+            await Methodic.objects.acreate(
+                name='Методичка 3',
+                price=200,
+                description='Методичка для решения вашей боли 3',
+            )
+    except Exception as e:
+        logging.error(f"Error while creating default methodic: {e}")
+
+
 @dispatcher.startup()
 async def on_startup() -> None:
     await set_bot_commands()
@@ -128,6 +181,9 @@ async def on_startup() -> None:
 
     # CREATION OF DEFAULT SHORT METHODIC
     await create_short_methodic_default()
+
+    # CREATION OF DEFAULT METHODIC
+    await create_methodic_default()
 
 
 def run_polling() -> None:
