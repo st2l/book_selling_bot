@@ -14,6 +14,7 @@ from bot.handlers import router
 from bot.short_methodics_handler import short_methodics_router
 from bot.main_menu import main_menu_router
 from bot.methodics_handler import methodics_router
+from bot.book_handler import book_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -30,6 +31,7 @@ dispatcher.include_router(router)
 dispatcher.include_router(short_methodics_router)
 dispatcher.include_router(main_menu_router)
 dispatcher.include_router(methodics_router)
+dispatcher.include_router(book_router)
 
 
 async def set_bot_commands() -> None:
@@ -111,7 +113,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Информация для методичек",
                 text="Информация для методичек!!",
             )
-        
+
         # Методичка куплена успешно
         try:
             q = await BotText.objects.aget(name='Методичка куплена успешно')
@@ -120,7 +122,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Методичка куплена успешно",
                 text="Методичка куплена успешно!!",
             )
-        
+
         # Описание при покупке всех методичек
         try:
             q = await BotText.objects.aget(name='Описание при покупке всех методичек')
@@ -128,6 +130,15 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Описание при покупке всех методичек",
                 text="Описание при покупке всех методичек!!",
+            )
+        
+        # Успешная покупка книги
+        try:
+            q = await BotText.objects.aget(name='Успешная покупка книги')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Успешная покупка книги",
+                text="Успешная покупка книги!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
@@ -137,7 +148,7 @@ async def create_short_methodic_default():
     try:
         from api.user.models import ShortMethodic
         try:
-            q = await ShortMethodic.objects.aget(name='Краткая методичка')
+            q = await ShortMethodic.objects.aget(id=1)
         except:
             await ShortMethodic.objects.acreate(
                 name='Краткая методичка',
@@ -152,7 +163,7 @@ async def create_methodic_default():
     try:
         from api.user.models import Methodic
         try:
-            q = await Methodic.objects.aget(name='Методичка 1')
+            q = await Methodic.objects.aget(id=1)
         except:
             await Methodic.objects.acreate(
                 name='Методичка 1',
@@ -161,7 +172,7 @@ async def create_methodic_default():
             )
 
         try:
-            q = await Methodic.objects.aget(name='Методичка 2')
+            q = await Methodic.objects.aget(id=2)
         except:
             await Methodic.objects.acreate(
                 name='Методичка 2',
@@ -170,7 +181,7 @@ async def create_methodic_default():
             )
 
         try:
-            q = await Methodic.objects.aget(name='Методичка 3')
+            q = await Methodic.objects.aget(id=3)
         except:
             await Methodic.objects.acreate(
                 name='Методичка 3',
@@ -179,6 +190,21 @@ async def create_methodic_default():
             )
     except Exception as e:
         logging.error(f"Error while creating default methodic: {e}")
+
+
+async def create_default_book():
+    try:
+        from api.user.models import Book
+        try:
+            q = await Book.objects.aget(id=1)
+        except:
+            await Book.objects.acreate(
+                name='Книга',
+                price=200,
+                description='Книга для решения вашей боли',
+            )
+    except Exception as e:
+        logging.error(f"Error while creating default book: {e}")
 
 
 @dispatcher.startup()
@@ -193,6 +219,9 @@ async def on_startup() -> None:
 
     # CREATION OF DEFAULT METHODIC
     await create_methodic_default()
+
+    # CREATION OF DEFAULT BOOK
+    await create_default_book()
 
 
 def run_polling() -> None:
