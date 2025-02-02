@@ -26,8 +26,10 @@ class ShortMethodicsStates(StatesGroup):
 async def short_methodics_handler(call: CallbackQuery):
     user = await identify_user(call)
 
+    short_methodic = await ShortMethodic.objects.aget(id=1)
+
     await call.message.edit_text(
-        text=await get_bot_text(name='Краткая информация для краткой методички'),
+        text=short_methodic.description,
         reply_markup=await short_methodics_keyboard()
     )
 
