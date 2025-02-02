@@ -59,7 +59,7 @@ async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
 
     await call.answer()
 
-    methodic = await Methodic.objects.aget(name='Методичка 1')
+    methodic = await Methodic.objects.aget(id=1)
     logging.info(f"Methodic: {methodic}")
 
     await call.bot.send_invoice(
@@ -78,7 +78,7 @@ async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(MethodicsStates.methodics_yookassa)
-    await state.update_data(methodic_name=methodic.name)
+    await state.update_data(methodic_id=methodic.id)
 
 
 @methodics_router.pre_checkout_query()
@@ -89,10 +89,10 @@ async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
 @methodics_router.message(F.successful_payment, MethodicsStates.methodics_yookassa)
 async def process_successful_payment(message: Message, state: FSMContext):
     data = await state.get_data()
-    methodic_name = data.get('methodic_name')
+    methodic_id = data.get('methodic_id')
 
     # if ALL methodics
-    if methodic_name == "Все методички":
+    if methodic_id == "Все методички":
         methodics = await sync_to_async(Methodic.objects.all, thread_sensitive=True)()
         async for methodic in methodics:
             user, _ = await identify_user(message)
@@ -110,7 +110,7 @@ async def process_successful_payment(message: Message, state: FSMContext):
         return
 
     user, _ = await identify_user(message)
-    methodic = await Methodic.objects.aget(name=methodic_name)
+    methodic = await Methodic.objects.aget(id=methodic_id)
 
     await History.objects.acreate(
         user=user,
@@ -132,7 +132,7 @@ async def process_successful_payment(message: Message, state: FSMContext):
 async def methodic_1_handler(call: CallbackQuery):
     user = await identify_user(call)
 
-    methodic = await Methodic.objects.aget(name='Методичка 2')
+    methodic = await Methodic.objects.aget(id=2)
 
     await call.message.edit_text(
         text=methodic.description,
@@ -147,7 +147,7 @@ async def methodic_2_purchase(call: CallbackQuery, state: FSMContext):
 
     await call.answer()
 
-    methodic = await Methodic.objects.aget(name='Методичка 2')
+    methodic = await Methodic.objects.aget(id=2)
     logging.info(f"Methodic: {methodic}")
 
     await call.bot.send_invoice(
@@ -166,7 +166,7 @@ async def methodic_2_purchase(call: CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(MethodicsStates.methodics_yookassa)
-    await state.update_data(methodic_name=methodic.name)
+    await state.update_data(methodic_id=methodic.id)
 
 
 # ########################################################
@@ -176,7 +176,7 @@ async def methodic_2_purchase(call: CallbackQuery, state: FSMContext):
 async def methodic_3_handler(call: CallbackQuery):
     user = await identify_user(call)
 
-    methodic = await Methodic.objects.aget(name='Методичка 3')
+    methodic = await Methodic.objects.aget(id=3)
 
     await call.message.edit_text(
         text=methodic.description,
@@ -191,7 +191,7 @@ async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
 
     await call.answer()
 
-    methodic = await Methodic.objects.aget(name='Методичка 3')
+    methodic = await Methodic.objects.aget(id=3)
     logging.info(f"Methodic: {methodic}")
 
     await call.bot.send_invoice(
@@ -210,7 +210,7 @@ async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(MethodicsStates.methodics_yookassa)
-    await state.update_data(methodic_name=methodic.name)
+    await state.update_data(methodic_id=methodic.id)
 
 
 # ########################################################
@@ -255,4 +255,4 @@ async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
     )
 
     await state.set_state(MethodicsStates.methodics_yookassa)
-    await state.update_data(methodic_name="Все методички")
+    await state.update_data(methodic_id="Все методички")
