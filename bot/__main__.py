@@ -162,7 +162,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Текст при оформлении подписки",
                 text="Текст при оформлении подписки!!",
             )
-        
+
         # Подписка успешно оформлена
         try:
             q = await BotText.objects.aget(name='Подписка успешно оформлена')
@@ -170,6 +170,33 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Подписка успешно оформлена",
                 text="Подписка успешно оформлена!!",
+            )
+        
+        # Тема успешно выбрана
+        try:
+            q = await BotText.objects.aget(name='Тема успешно выбрана')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Тема успешно выбрана",
+                text="Тема успешно выбрана!!",
+            )
+        
+        # Оцените подписку
+        try:
+            q = await BotText.objects.aget(name='Оцените подписку')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Оцените подписку",
+                text="Оцените подписку!!",
+            )
+        
+        # Спасибо за оценку
+        try:
+            q = await BotText.objects.aget(name='Спасибо за оценку')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Спасибо за оценку",
+                text="Спасибо за оценку!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
@@ -238,6 +265,33 @@ async def create_default_book():
         logging.error(f"Error while creating default book: {e}")
 
 
+async def create_default_themes():
+    try:
+        from api.user.models import ThemePool
+        try:
+            q = await ThemePool.objects.aget(id=1)
+        except:
+            await ThemePool.objects.acreate(
+                name='Саморазвитие',
+            )
+
+        try:
+            q = await ThemePool.objects.aget(id=2)
+        except:
+            await ThemePool.objects.acreate(
+                name='Продуктивность',
+            )
+
+        try:
+            q = await ThemePool.objects.aget(id=3)
+        except:
+            await ThemePool.objects.acreate(
+                name='Управление временем',
+            )
+    except Exception as e:
+        logging.error(f"Error while creating default themes: {e}")
+
+
 async def create_default_subscriptions():
     try:
         from api.user.models import SubscriptionDetails
@@ -289,6 +343,9 @@ async def on_startup() -> None:
 
     # CREATION OF DEFAULT SUBSCRIPTIONS
     await create_default_subscriptions()
+
+    # CREATION OF DEFAULT THEMES
+    await create_default_themes()
 
 
 def run_polling() -> None:

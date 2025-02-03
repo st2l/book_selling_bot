@@ -8,8 +8,9 @@ from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
-from api.user.models import User, SubscriptionDetails, Subscription
-from bot.keyboard import go_on_subscription_keyboard, back_to_main_keyboard
+from api.user.models import User, SubscriptionDetails, Subscription, Theme, ThemePool, Rating
+from bot.keyboard import go_on_subscription_keyboard, back_to_main_keyboard, \
+    subscription_purchased_keyboard, rate_subscription_keyboard, theme_chosen_keyboard
 
 from utils import get_bot_text, identify_user
 
@@ -122,6 +123,50 @@ async def subsription_purchased(message: Message, state: FSMContext):
 
     await message.answer(
         text=await get_bot_text('Подписка успешно оформлена'),
-        reply_markup=await back_to_main_keyboard(),
+        reply_markup=await subscription_purchased_keyboard(),
     )
     await state.clear()
+
+
+@go_on_subscription_router.callback_query(F.data.startswith('theme_'))
+async def theme_chosen(call: CallbackQuery):
+    user, is_new = await identify_user(call)
+
+    theme_id = int(call.data.split('_')[1])
+    theme = await ThemePool.objects.aget(id=theme_id)
+
+    await Theme.objects.acreate(user=user, theme_type=theme)
+
+    await call.message.edit_text(
+        text=await get_bot_text('Тема успешно выбрана'),
+        reply_markup=await theme_chosen_keyboard(),
+    )
+
+    await call.answer()
+
+
+@go_on_subscription_router.callback_query(F.data == 'rate_subscription')
+async def rate_subscription(call: CallbackQuery):
+    user, is_new = await identify_user(call)
+
+    await call.message.edit_text(
+        text=await get_bot_text('Оцените подписку'),
+        reply_markup=await rate_subscription_keyboard(),
+    )
+
+    await call.answer()
+
+
+@go_on_subscription_router.callback_query(F.data.startswith('rate_'))
+async def rate_subscription(call: CallbackQuery):
+    user, is_new = await identify_user(call)
+
+    rate = int(call.data.split('_')[1])
+    await Rating.objects.acreate(user=user, rating=rate)
+
+    await call.message.edit_text(
+        text=await get_bot_text('Спасибо за оценку'),
+        reply_markup=await back_to_main_keyboard(),
+    )
+
+    await call.answer()

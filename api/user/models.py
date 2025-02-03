@@ -41,6 +41,26 @@ class Subscription(models.Model):
         return f"{self.user.username} - {self.subscription_type}"
 
 
+class ThemePool(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class Theme(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    theme_type = models.ForeignKey(ThemePool, on_delete=models.CASCADE)
+
+
+class Notification(models.Model):
+    text = models.TextField()
+    time = models.DateTimeField()
+
+
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+
+
 class Methodic(models.Model):
     # for methodics in shop
 
