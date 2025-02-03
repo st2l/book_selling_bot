@@ -4,7 +4,8 @@ from typing import Any
 
 from django.contrib import admin
 
-from api.user.models import User, BotText, Subscription, Methodic, ShortMethodic, Book, History, Task, TaskSolved, SubscriptionDetails
+from api.user.models import User, BotText, Subscription, Methodic, ShortMethodic, \
+    Book, History, Task, TaskSolved, SubscriptionDetails, Theme, ThemePool, Notification, Rating
 
 
 @admin.register(User)
@@ -80,3 +81,23 @@ class TaskSolvedAdmin(admin.ModelAdmin):
 @admin.register(SubscriptionDetails)
 class SubscriptionDetailsAdmin(admin.ModelAdmin):
     list_display = ("name", "price", "description")
+
+
+@admin.register(Theme)
+class ThemeAdmin(admin.ModelAdmin):
+    list_display = ("user", "theme_type")
+
+
+@admin.register(ThemePool)
+class ThemePoolAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ("text", "time")
+
+
+@admin.register(Rating)
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ("user", "rating")

@@ -17,6 +17,7 @@ from bot.methodics_handler import methodics_router
 from bot.book_handler import book_router
 from bot.help_handler import help_router
 from bot.go_on_subscription_handler import go_on_subscription_router
+from bot.user_lk_handler import user_lk_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -36,6 +37,7 @@ dispatcher.include_router(methodics_router)
 dispatcher.include_router(book_router)
 dispatcher.include_router(help_router)
 dispatcher.include_router(go_on_subscription_router)
+dispatcher.include_router(user_lk_router)
 
 
 async def set_bot_commands() -> None:
@@ -171,7 +173,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Подписка успешно оформлена",
                 text="Подписка успешно оформлена!!",
             )
-        
+
         # Тема успешно выбрана
         try:
             q = await BotText.objects.aget(name='Тема успешно выбрана')
@@ -180,7 +182,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Тема успешно выбрана",
                 text="Тема успешно выбрана!!",
             )
-        
+
         # Оцените подписку
         try:
             q = await BotText.objects.aget(name='Оцените подписку')
@@ -189,7 +191,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Оцените подписку",
                 text="Оцените подписку!!",
             )
-        
+
         # Спасибо за оценку
         try:
             q = await BotText.objects.aget(name='Спасибо за оценку')
@@ -197,6 +199,78 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Спасибо за оценку",
                 text="Спасибо за оценку!!",
+            )
+
+        # История покупок
+        try:
+            q = await BotText.objects.aget(name='История покупок')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="История покупок",
+                text="История покупок!!",
+            )
+
+        # Изменить интересующие темы
+        try:
+            q = await BotText.objects.aget(name='Изменить интересующие темы')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Изменить интересующие темы",
+                text="Изменить интересующие темы!!",
+            )
+
+        # Изменить напоминания
+        try:
+            q = await BotText.objects.aget(name='Изменить напоминания')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Изменить напоминания",
+                text="Изменить напоминания!!",
+            )
+
+        # Добавить текст напоминанию
+        try:
+            q = await BotText.objects.aget(name='Добавить текст напоминанию')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Добавить текст напоминанию",
+                text="Введите текст для вашего напоминания!!",
+            )
+
+        # Добавить время напоминания
+        try:
+            q = await BotText.objects.aget(name='Добавить время напоминания')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Добавить время напоминания",
+                text="Введите время для напоминания в формате ЧЧ:ММ!!",
+            )
+
+        # Напоминание добавлено
+        try:
+            q = await BotText.objects.aget(name='Напоминание добавлено')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Напоминание добавлено",
+                text="Напоминание добавлено!!",
+            )
+
+        # Напоминание добавлено
+        try:
+            q = await BotText.objects.aget(name='Текст уведомления изменен')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Текст уведомления изменен",
+                text="Текст уведомления изменен!!",
+            )
+
+        # Уведомление удалено
+        try:
+            q = await BotText.objects.aget(name='Уведомление удалено')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Уведомление удалено",
+                text="Уведомление удалено!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
@@ -302,6 +376,7 @@ async def create_default_subscriptions():
                 name='1 неделя',
                 price=200,
                 description='1 недельная подписка',
+                days=7,
             )
 
         try:
@@ -311,6 +386,7 @@ async def create_default_subscriptions():
                 name='1 месяц',
                 price=500,
                 description='1 месячная подписка',
+                days=30,
             )
 
         try:
@@ -320,6 +396,7 @@ async def create_default_subscriptions():
                 name='3 месяца',
                 price=1000,
                 description='3 месячная подписка',
+                days=90,
             )
     except Exception as e:
         logging.error(f"Error while creating default subscriptions: {e}")
