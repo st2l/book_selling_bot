@@ -16,6 +16,7 @@ from bot.main_menu import main_menu_router
 from bot.methodics_handler import methodics_router
 from bot.book_handler import book_router
 from bot.help_handler import help_router
+from bot.go_on_subscription_handler import go_on_subscription_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -34,6 +35,7 @@ dispatcher.include_router(main_menu_router)
 dispatcher.include_router(methodics_router)
 dispatcher.include_router(book_router)
 dispatcher.include_router(help_router)
+dispatcher.include_router(go_on_subscription_router)
 
 
 async def set_bot_commands() -> None:
@@ -133,7 +135,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Описание при покупке всех методичек",
                 text="Описание при покупке всех методичек!!",
             )
-        
+
         # Успешная покупка книги
         try:
             q = await BotText.objects.aget(name='Успешная покупка книги')
@@ -142,7 +144,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Успешная покупка книги",
                 text="Успешная покупка книги!!",
             )
-        
+
         # Помощь
         try:
             q = await BotText.objects.aget(name='Помощь')
@@ -150,6 +152,24 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Помощь",
                 text="Помощь текст!!",
+            )
+
+        # Текст при оформлении подписки
+        try:
+            q = await BotText.objects.aget(name='Текст при оформлении подписки')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Текст при оформлении подписки",
+                text="Текст при оформлении подписки!!",
+            )
+        
+        # Подписка успешно оформлена
+        try:
+            q = await BotText.objects.aget(name='Подписка успешно оформлена')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Подписка успешно оформлена",
+                text="Подписка успешно оформлена!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
@@ -218,6 +238,39 @@ async def create_default_book():
         logging.error(f"Error while creating default book: {e}")
 
 
+async def create_default_subscriptions():
+    try:
+        from api.user.models import SubscriptionDetails
+        try:
+            q = await SubscriptionDetails.objects.aget(id=1)
+        except:
+            await SubscriptionDetails.objects.acreate(
+                name='1 неделя',
+                price=200,
+                description='1 недельная подписка',
+            )
+
+        try:
+            q = await SubscriptionDetails.objects.aget(id=2)
+        except:
+            await SubscriptionDetails.objects.acreate(
+                name='1 месяц',
+                price=500,
+                description='1 месячная подписка',
+            )
+
+        try:
+            q = await SubscriptionDetails.objects.aget(id=3)
+        except:
+            await SubscriptionDetails.objects.acreate(
+                name='3 месяца',
+                price=1000,
+                description='3 месячная подписка',
+            )
+    except Exception as e:
+        logging.error(f"Error while creating default subscriptions: {e}")
+
+
 @dispatcher.startup()
 async def on_startup() -> None:
     await set_bot_commands()
@@ -233,6 +286,9 @@ async def on_startup() -> None:
 
     # CREATION OF DEFAULT BOOK
     await create_default_book()
+
+    # CREATION OF DEFAULT SUBSCRIPTIONS
+    await create_default_subscriptions()
 
 
 def run_polling() -> None:

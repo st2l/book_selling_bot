@@ -19,27 +19,76 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
 
         if not q:
 
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="Краткая методичка",
-                                      callback_data="short_methodics")],
-                [InlineKeyboardButton(
-                    text="Методичка", callback_data="methodics")],
-                [InlineKeyboardButton(text="Книга", callback_data="book")],
-                [InlineKeyboardButton(text="Оформить подписку",
-                                      callback_data="go_on_subscription")],
-                [InlineKeyboardButton(text="Помощь", callback_data="help")],
-            ])
+            try:
+                q = False
+                async for el in Subscription.objects.filter(user=user):
+                    q = True
+                    break
+            except Exception as e:
+                logging.error(f'Error while getting user subscription: {e}')
+                q = False
+
+            if q:
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+
+                    [InlineKeyboardButton(text="Краткая методичка",
+                                          callback_data="short_methodics")],
+                    [InlineKeyboardButton(
+                        text="Методичка", callback_data="methodics")],
+                    [InlineKeyboardButton(text="Книга", callback_data="book")],
+                    [InlineKeyboardButton(text="Личный кабинет",
+                                          callback_data="user_lk")],
+                    [InlineKeyboardButton(
+                        text="Помощь", callback_data="help")],
+                ])
+            else:
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Краткая методичка",
+                                        callback_data="short_methodics")],
+                    [InlineKeyboardButton(
+                        text="Методичка", callback_data="methodics")],
+                    [InlineKeyboardButton(text="Книга", callback_data="book")],
+                    [InlineKeyboardButton(text="Оформить подписку",
+                                        callback_data="go_on_subscription")],
+                    [InlineKeyboardButton(text="Помощь", callback_data="help")],
+                ])
         else:
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="Краткая методичка",
-                                      callback_data="short_methodics")],
-                [InlineKeyboardButton(
-                    text="Методичка", callback_data="methodics")],
-                [InlineKeyboardButton(text="Книга", callback_data="book")],
-                [InlineKeyboardButton(text="Личный кабинет",
-                                      callback_data="user_lk")],
-                [InlineKeyboardButton(text="Помощь", callback_data="help")],
-            ])
+            try:
+                q = False
+                async for el in Subscription.objects.filter(user=user):
+                    q = True
+                    break
+            except Exception as e:
+                logging.error(f'Error while getting user subscription: {e}')
+                q = False
+
+            if q:
+
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Краткая методичка",
+                                          callback_data="short_methodics")],
+                    [InlineKeyboardButton(
+                        text="Методичка", callback_data="methodics")],
+                    [InlineKeyboardButton(text="Книга", callback_data="book")],
+                    [InlineKeyboardButton(text="Личный кабинет",
+                                          callback_data="user_lk")],
+                    [InlineKeyboardButton(
+                        text="Помощь", callback_data="help")],
+                ])
+            else:
+                keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                    [InlineKeyboardButton(text="Краткая методичка",
+                                          callback_data="short_methodics")],
+                    [InlineKeyboardButton(
+                        text="Методичка", callback_data="methodics")],
+                    [InlineKeyboardButton(text="Книга", callback_data="book")],
+                    [InlineKeyboardButton(text="Личный кабинет",
+                                          callback_data="user_lk")],
+                    [InlineKeyboardButton(text="Оформить подписку",
+                                          callback_data="go_on_subscription")],
+                    [InlineKeyboardButton(
+                        text="Помощь", callback_data="help")],
+                ])
 
         return keyboard
     except Exception as e:

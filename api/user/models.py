@@ -18,16 +18,27 @@ class BotText(models.Model):
         return self.name
 
 
+class SubscriptionDetails(models.Model):
+    # for subscription details
+
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.name
+
+
 class Subscription(models.Model):
     # for subscriptions of users
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # can be "weekly" or "monthly", "3 mounths"
-    subscription_type = models.CharField(max_length=255)
+    subscription_type = models.ForeignKey(
+        SubscriptionDetails, on_delete=models.CASCADE)
     date_of_creation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.subscription}"
+        return f"{self.user.username} - {self.subscription_type}"
 
 
 class Methodic(models.Model):

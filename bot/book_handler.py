@@ -60,7 +60,7 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
 
-@book_router.message(F.successful_payment)
+@book_router.message(F.successful_payment, BookState.purchase)
 async def book_payment_handler(message: Message, state: FSMContext):
     user, _ = await identify_user(message)
     book = await Book.objects.aget(id=1)
