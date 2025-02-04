@@ -126,3 +126,39 @@ async def view_asnwer_handler(call: CallbackQuery):
     )
 
     await call.answer()
+
+
+class DiscussTaskStates(StatesGroup):
+    task_id = State()
+    text = State()
+
+
+@tasks_router.callback_query(F.data.startswith('discuss_'))
+async def discuss_handler(call: CallbackQuery, state: FSMContext):
+    user, _ = await identify_user(call)
+
+    await state.set_state(DiscussTaskStates.text)
+    await state.set_state(task_id=call.data.split('_')[1])
+
+    task_id = call.data.split('_')[1]
+    task = await get_task_by_id(task_id)
+
+    await call.message.edit_text(
+        text=await get_bot_text(name='Обсуждение главы'),
+        reply_markup=await chapter_keyboard(user, task)
+    )
+
+    await call.answer()
+
+
+@tasks_router.message(DiscussTaskStates.text)
+async def discuss_text_handler(message: Message, state: FSMContext):
+    user, _ = await identify_user(message)
+
+    data = await state.get_data()
+    task_id = data.get('task_id')
+    task = await get_task_by_id(task_id)
+
+    # TODO: write deepseek integration
+
+    await state.clear()

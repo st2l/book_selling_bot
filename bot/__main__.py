@@ -301,6 +301,15 @@ async def create_all_default_bot_texts() -> None:
                 name="Задача решена успешно",
                 text="Задача решена успешно!!",
             )
+        
+        # Обсуждение главы
+        try:
+            q = await BotText.objects.aget(name='Обсуждение главы')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Обсуждение главы",
+                text="Обсуждение главы!!",
+            )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
 

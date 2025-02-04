@@ -9,7 +9,7 @@ from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
-from api.user.models import User, Subscription, History, SubscriptionDetails, Theme, ThemePool, Notification
+from api.user.models import User, Subscription, History, SubscriptionDetails, Theme, ThemePool, Notification, TaskSolved
 from bot.keyboard import user_lk_keyboard, history_keyboard, back_to_main_keyboard, \
     change_theme_keyboard, notifications_settings_keyboard, view_notification_keyboard
 
@@ -27,6 +27,11 @@ def get_subscription_details(subs: Subscription):
     return SubscriptionDetails.objects.get(id=subs.subscription_type.id)
 
 
+@sync_to_async()
+def get_history(user: User, number_of_chapter: int):
+    return TaskSolved.objects.filter(user=user, task__number_of_chapter=number_of_chapter).first()
+
+
 @user_lk_router.callback_query(F.data == 'user_lk')
 async def user_lk_handler(call: CallbackQuery):
     user, is_new = await identify_user(call)
@@ -42,12 +47,36 @@ async def user_lk_handler(call: CallbackQuery):
         ssss = await get_subscription_details(subs)
         status = "✔ Активна до " + (subs.date_of_creation + timedelta(days=ssss.days))\
             .strftime("%d.%m.%Y")
+
+        progress = "\n\n<b>Прогресс:</b>\n"
+        if ssss.id == 1:
+            for i in range(1, 4):
+                history = await get_history(user, i)
+                if history:
+                    progress += f"Глава {i}: ✅\n"
+                else:
+                    progress += f"Глава {i}: ❌\n"
+        elif ssss.id == 2:
+            for i in range(1, 6):
+                history = await get_history
+                if history:
+                    progress += f"Глава {i}: ✅\n"
+                else:
+                    progress += f"Глава {i}: ❌\n"
+        elif ssss.id == 3:
+            for i in range(1, 8):
+                history = await get_history(user, i)
+                if history:
+                    progress += f"Глава {i}: ✅\n"
+                else:
+                    progress += f"Глава {i}: ❌\n"
     else:
         status = "❌ Не подписан"
+        progress = ""
 
     await call.message.edit_text(
         text=f"""<b>Личный кабинет</b>
-💵 Статус подписки: {status}""",
+💵 Статус подписки: {status}{progress}""",
         reply_markup=await user_lk_keyboard(user, subs),
         parse_mode='HTML'
     )
@@ -267,12 +296,6 @@ async def change_text_notification_handler(message: Message, state: FSMContext):
     await state.clear()
 
 
-
-
-
-
-
-
 class ChangeTime(StatesGroup):
     id_ = State()
     time = State()
@@ -320,9 +343,11 @@ async def change_time_notification_handler(message: Message, state: FSMContext):
 
     await state.clear()
 
+
 @sync_to_async()
 def delete_notification(notification_id: int):
     Notification.objects.filter(id=notification_id).delete()
+
 
 @user_lk_router.callback_query(F.data.startswith('delete_notification_'))
 async def delete_notification_handler(call: CallbackQuery):
@@ -330,7 +355,6 @@ async def delete_notification_handler(call: CallbackQuery):
 
     notification_id = int(call.data.split('_')[-1])
     await delete_notification(notification_id)
-
 
     await call.message.edit_text(
         text=await get_bot_text(name='Уведомление удалено'),
