@@ -18,6 +18,7 @@ from bot.book_handler import book_router
 from bot.help_handler import help_router
 from bot.go_on_subscription_handler import go_on_subscription_router
 from bot.user_lk_handler import user_lk_router
+from bot.tasks_handler import tasks_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -38,6 +39,7 @@ dispatcher.include_router(book_router)
 dispatcher.include_router(help_router)
 dispatcher.include_router(go_on_subscription_router)
 dispatcher.include_router(user_lk_router)
+dispatcher.include_router(tasks_router)
 
 
 async def set_bot_commands() -> None:
@@ -271,6 +273,15 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Уведомление удалено",
                 text="Уведомление удалено!!",
+            )
+        
+        # Задания
+        try:
+            q = await BotText.objects.aget(name='Задания')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Задания",
+                text="Задания!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")

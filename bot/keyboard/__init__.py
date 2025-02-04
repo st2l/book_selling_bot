@@ -8,3 +8,4 @@ from .go_on_subscription_keyboard import go_on_subscription_keyboard, \
     subscription_purchased_keyboard, theme_chosen_keyboard, rate_subscription_keyboard
 from .user_lk_keyboard import user_lk_keyboard, history_keyboard, change_theme_keyboard, \
     notifications_settings_keyboard, view_notification_keyboard
+from .tasks_keyboard import choose_tasks_keyboard, chapter_keyboard
