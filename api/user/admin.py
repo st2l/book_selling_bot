@@ -5,7 +5,8 @@ from typing import Any
 from django.contrib import admin
 
 from api.user.models import User, BotText, Subscription, Methodic, ShortMethodic, \
-    Book, History, Task, TaskSolved, SubscriptionDetails, Theme, ThemePool, Notification, Rating
+    Book, History, Task, TaskSolved, SubscriptionDetails, Theme, ThemePool, Notification, Rating, \
+    SendMessage
 
 
 @admin.register(User)
@@ -101,3 +102,7 @@ class NotificationAdmin(admin.ModelAdmin):
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
     list_display = ("user", "rating")
+
+@admin.register(SendMessage)
+class SendMessageAdmin(admin.ModelAdmin):
+    list_display = ("message", "date_to_send", "theme_type")

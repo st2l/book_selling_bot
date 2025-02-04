@@ -45,11 +45,15 @@ class Subscription(models.Model):
 class ThemePool(models.Model):
     name = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.name
+
 
 class Theme(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     theme_type = models.ForeignKey(ThemePool, on_delete=models.CASCADE)
+
 
 
 class Notification(models.Model):
@@ -136,3 +140,34 @@ class TaskSolved(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.task.number_of_chapter}"
+
+
+class SendMessage(models.Model):
+
+    BUTTON_TEXT_CHOICES = (
+        ('option1', 'Нет кнопки'),
+        ('option2', 'Кнопка на ЛК'),
+        ('option3', 'Кнопка на задания'),
+        ('option4', 'Кнопка на покупку книги'),
+        ('option5', 'Кнопка на покупку методичек'),
+    )
+
+    message = models.TextField()
+    date_to_send = models.DateTimeField()
+    theme_type = models.ForeignKey(ThemePool, on_delete=models.CASCADE)
+    theme_all = models.BooleanField(default=False)
+
+    photo_1 = models.ImageField(upload_to='photos/', null=True, blank=True)
+    photo_2 = models.ImageField(upload_to='photos/', null=True, blank=True)
+    photo_3 = models.ImageField(upload_to='photos/', null=True, blank=True)
+    photo_4 = models.ImageField(upload_to='photos/', null=True, blank=True)
+    photo_5 = models.ImageField(upload_to='photos/', null=True, blank=True)
+
+    video_1 = models.FileField(upload_to='videos/', null=True, blank=True)
+    video_2 = models.FileField(upload_to='videos/', null=True, blank=True)
+    video_3 = models.FileField(upload_to='videos/', null=True, blank=True)
+
+    button_text = models.CharField(max_length=50, choices=BUTTON_TEXT_CHOICES)
+
+    def __str__(self):
+        return self.message
