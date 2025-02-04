@@ -131,6 +131,7 @@ class TaskSolved(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    text = models.TextField(default='')
     date_of_solving = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
