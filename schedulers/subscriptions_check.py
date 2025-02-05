@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from asgiref.sync import sync_to_async
-from api.user.models import Subscription, SubscriptionDetails, User
+from api.user.models import Subscription, SubscriptionDetails, User, Notification, Theme
 from bot.bot_instance import bot
 import logging
 import pytz
@@ -14,7 +14,10 @@ def get_active_subscriptions():
 
 @sync_to_async
 def delete_subscription(subscription: Subscription):
+    user = subscription.user
     subscription.delete()
+    Notification.objects.filter(user=user).delete()
+    Theme.objects.filter(user=user).delete()
 
 
 @sync_to_async
