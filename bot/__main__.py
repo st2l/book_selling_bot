@@ -19,6 +19,7 @@ from bot.help_handler import help_router
 from bot.go_on_subscription_handler import go_on_subscription_router
 from bot.user_lk_handler import user_lk_router
 from bot.tasks_handler import tasks_router
+from bot.admin import admin_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -45,6 +46,7 @@ dispatcher.include_router(help_router)
 dispatcher.include_router(go_on_subscription_router)
 dispatcher.include_router(user_lk_router)
 dispatcher.include_router(tasks_router)
+dispatcher.include_router(admin_router)
 
 
 async def set_bot_commands() -> None:
