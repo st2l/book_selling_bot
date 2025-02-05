@@ -3,11 +3,11 @@ from __future__ import annotations
 import logging.config
 import sys
 
-from aiogram import Bot, Dispatcher
+from aiogram import Dispatcher
 from aiogram.types import BotCommand
 
-from api.config.logging import LOGGING
-from bot.config.bot import RUNNING_MODE, TELEGRAM_API_TOKEN, RunningMode
+from bot.bot_instance import bot
+from bot.config.bot import RUNNING_MODE, RunningMode
 
 # ROUTERS
 from bot.handlers import router
@@ -24,11 +24,15 @@ from bot.tasks_handler import tasks_router
 from asgiref.sync import sync_to_async
 from api.user.models import BotText
 
-# LOGGING
-logging.config.dictConfig(LOGGING)
-logger = logging.getLogger(__name__)
+# FOR SCHEDULER
+from schedulers import check_and_send_notifications, \
+    check_and_notify_subscriptions
 
-bot = Bot(TELEGRAM_API_TOKEN)
+from datetime import datetime
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from api.user.models import Notification, User
+
+logger = logging.getLogger(__name__)
 
 dispatcher = Dispatcher()
 dispatcher.include_router(router)
@@ -274,7 +278,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Уведомление удалено",
                 text="Уведомление удалено!!",
             )
-        
+
         # Задания
         try:
             q = await BotText.objects.aget(name='Задания')
@@ -283,7 +287,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Задания",
                 text="Задания!!",
             )
-        
+
         # Введите решение задачи
         try:
             q = await BotText.objects.aget(name='Введите решение задачи')
@@ -292,7 +296,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Введите решение задачи",
                 text="Введите решение задачи!!",
             )
-        
+
         # Задача решена успешно
         try:
             q = await BotText.objects.aget(name='Задача решена успешно')
@@ -301,7 +305,7 @@ async def create_all_default_bot_texts() -> None:
                 name="Задача решена успешно",
                 text="Задача решена успешно!!",
             )
-        
+
         # Обсуждение главы
         try:
             q = await BotText.objects.aget(name='Обсуждение главы')
@@ -309,6 +313,15 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Обсуждение главы",
                 text="Обсуждение главы!!",
+            )
+
+        # Время уведомления изменено
+        try:
+            q = await BotText.objects.aget(name='Время уведомления изменено')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Время уведомления изменено",
+                text="Время уведомления изменено!!",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")
@@ -440,6 +453,13 @@ async def create_default_subscriptions():
         logging.error(f"Error while creating default subscriptions: {e}")
 
 
+def start_scheduler():
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(check_and_send_notifications, 'cron', minute='*')
+    scheduler.add_job(check_and_notify_subscriptions, 'cron', hour=0, minute=0)
+    scheduler.start()
+
+
 @dispatcher.startup()
 async def on_startup() -> None:
     await set_bot_commands()
@@ -462,9 +482,12 @@ async def on_startup() -> None:
     # CREATION OF DEFAULT THEMES
     await create_default_themes()
 
+    # START SCHEDULER
+    start_scheduler()
 
-def run_polling() -> None:
-    dispatcher.run_polling(bot)
+
+async def run_polling() -> None:
+    await dispatcher.start_polling(bot)
 
 
 def run_webhook() -> None:
@@ -472,11 +495,26 @@ def run_webhook() -> None:
     raise NotImplementedError(msg)
 
 
+async def main():
+    start_scheduler()
+    await run_polling()
+
 if __name__ == "__main__":
-    if RUNNING_MODE == RunningMode.LONG_POLLING:
-        run_polling()
-    elif RUNNING_MODE == RunningMode.WEBHOOK:
-        run_webhook()
-    else:
-        logger.error("Unknown running mode")
-        sys.exit(1)
+    import asyncio
+
+    asyncio.run(main())
+
+    # loop = asyncio.new_event_loop()
+    # asyncio.set_event_loop(loop)
+    # loop.create_task(start_scheduler())
+    # loop.run_forever()
+    # # loop.close()
+    # # start_scheduler()
+
+    # if RUNNING_MODE == RunningMode.LONG_POLLING:
+    #     run_polling()
+    # elif RUNNING_MODE == RunningMode.WEBHOOK:
+    #     run_webhook()
+    # else:
+    #     logger.error("Unknown running mode")
+    #     sys.exit(1)
