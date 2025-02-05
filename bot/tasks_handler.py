@@ -139,7 +139,7 @@ async def discuss_handler(call: CallbackQuery, state: FSMContext):
     user, _ = await identify_user(call)
 
     await state.set_state(DiscussTaskStates.text)
-    await state.set_state(task_id=call.data.split('_')[1])
+    await state.update_data(task_id=call.data.split('_')[1])
 
     task_id = call.data.split('_')[1]
     task = await get_task_by_id(task_id)
