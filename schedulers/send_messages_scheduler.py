@@ -1,9 +1,9 @@
 from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from asgiref.sync import sync_to_async
-from api.user.models import SendMessage, User, Theme
+from api.user.models import SendMessage, User, Theme, Subscription
 from bot.bot_instance import bot
-from aiogram.types import FSInputFile
+from aiogram.types import FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.media_group import MediaGroupBuilder
 import logging
 import pytz
@@ -29,11 +29,16 @@ def get_users_by_theme(message: SendMessage):
 
 @sync_to_async
 def get_all_users():
-    return User.objects.all()
+    ans = []
+    for el in User.objects.all():
+        subs = Subscription.objects.filter(user=el)
+        if subs:
+            ans.append(el)
+    return ans
 
 
 async def send_message_to_users(message: SendMessage, users):
-    media_group = MediaGroupBuilder(caption=message.message)
+    media_group = MediaGroupBuilder()
     if message.photo_1:
         media_group.add_photo(media=FSInputFile(message.photo_1.path))
     if message.photo_2:
@@ -51,16 +56,38 @@ async def send_message_to_users(message: SendMessage, users):
     if message.video_3:
         media_group.add_video(media=FSInputFile(message.video_3.path))
 
+    kb = None
+    if message.button_text != 'option1':
+        arr = []
+        if message.button_text == 'option2':
+            arr.append([InlineKeyboardButton(
+                text='Перейти в ЛК', callback_data='user_lk')])
+        if message.button_text == 'option3':
+            arr.append([InlineKeyboardButton(
+                text='Перейти к заданиям', callback_data='tasks')])
+        if message.button_text == 'option4':
+            arr.append([InlineKeyboardButton(
+                text='Купить книгу', callback_data='book')])
+        if message.button_text == 'option5':
+            arr.append([InlineKeyboardButton(
+                text='Купить методички', callback_data='methodic')])
+        kb = InlineKeyboardMarkup(inline_keyboard=arr)
+
     sent = set()
-    async for user in users:
+    for user in users:
         logging.info(f'Sending message to {user.username}')
         if user in sent:
             continue
         try:
             if message.photo_1 or message.photo_2 or message.photo_3 or message.photo_4 or message.photo_5 or message.video_1 or message.video_2 or message.video_3:
-                await bot.send_media_group(chat_id=user.username, media=media_group.build())
+                if kb is None:
+                    media_group.caption = message.message
+                    await bot.send_media_group(chat_id=user.username, media=media_group.build())
+                else:
+                    await bot.send_media_group(chat_id=user.username, media=media_group.build())
+                    await bot.send_message(chat_id=user.username, text=message.message, reply_markup=kb)
             else:
-                await bot.send_message(chat_id=user.username, text=message.message)
+                await bot.send_message(chat_id=user.username, text=message.message, reply_markup=kb)
         except Exception as e:
             logging.error(f'Error sending message to {user.username}: {e}')
         sent.add(user)
