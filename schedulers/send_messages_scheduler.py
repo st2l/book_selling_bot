@@ -1,0 +1,82 @@
+from datetime import datetime
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from asgiref.sync import sync_to_async
+from api.user.models import SendMessage, User, Theme
+from bot.bot_instance import bot
+from aiogram.types import FSInputFile
+from aiogram.utils.media_group import MediaGroupBuilder
+import logging
+import pytz
+import asyncio
+
+
+@sync_to_async
+def get_messages_to_send():
+    now = datetime.now(pytz.utc)
+    return SendMessage.objects.filter(date_to_send__lte=now)
+
+
+@sync_to_async
+def mark_message_as_sent(message: SendMessage):
+    message.delete()
+
+
+@sync_to_async
+def get_users_by_theme(message: SendMessage):
+    theme = message.theme_type
+    return User.objects.filter(theme__theme_type=theme)
+
+
+@sync_to_async
+def get_all_users():
+    return User.objects.all()
+
+
+async def send_message_to_users(message: SendMessage, users):
+    media_group = MediaGroupBuilder(caption=message.message)
+    if message.photo_1:
+        media_group.add_photo(media=FSInputFile(message.photo_1.path))
+    if message.photo_2:
+        media_group.add_photo(media=FSInputFile(message.photo_2.path))
+    if message.photo_3:
+        media_group.add_photo(media=FSInputFile(message.photo_3.path))
+    if message.photo_4:
+        media_group.add_photo(media=FSInputFile(message.photo_4.path))
+    if message.photo_5:
+        media_group.add_photo(media=FSInputFile(message.photo_5.path))
+    if message.video_1:
+        media_group.add_video(media=FSInputFile(message.video_1.path))
+    if message.video_2:
+        media_group.add_video(media=FSInputFile(message.video_2.path))
+    if message.video_3:
+        media_group.add_video(media=FSInputFile(message.video_3.path))
+
+    sent = set()
+    async for user in users:
+        logging.info(f'Sending message to {user.username}')
+        if user in sent:
+            continue
+        try:
+            if message.photo_1 or message.photo_2 or message.photo_3 or message.photo_4 or message.photo_5 or message.video_1 or message.video_2 or message.video_3:
+                await bot.send_media_group(chat_id=user.username, media=media_group.build())
+            else:
+                await bot.send_message(chat_id=user.username, text=message.message)
+        except Exception as e:
+            logging.error(f'Error sending message to {user.username}: {e}')
+        sent.add(user)
+
+
+async def check_and_send_messages():
+    asyncio.sleep(5)
+    logging.info('Checking messages to send')
+
+    messages = await get_messages_to_send()
+
+    async for message in messages:
+        if message.theme_all:
+            users = await get_all_users()
+        else:
+            users = await get_users_by_theme(message)
+
+        await send_message_to_users(message, users)
+        await mark_message_as_sent(message)

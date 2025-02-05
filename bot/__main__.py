@@ -26,7 +26,8 @@ from api.user.models import BotText
 
 # FOR SCHEDULER
 from schedulers import check_and_send_notifications, \
-    check_and_notify_subscriptions
+    check_and_notify_subscriptions, \
+    check_and_send_messages
 
 from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -455,7 +456,8 @@ async def create_default_subscriptions():
 
 def start_scheduler():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(check_and_send_notifications, 'cron', minute='*')
+    scheduler.add_job(check_and_send_notifications, 'interval', minutes=1)
+    scheduler.add_job(check_and_send_messages, 'interval', minutes=1)
     scheduler.add_job(check_and_notify_subscriptions, 'cron', hour=0, minute=0)
     scheduler.start()
 
