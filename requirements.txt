@@ -24,3 +24,4 @@ redis==5.2.1
 sentry-sdk==2.20.0
 pillow
 apscheduler
+openai

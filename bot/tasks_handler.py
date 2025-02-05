@@ -1,4 +1,5 @@
 from __future__ import annotations
+from deepseek import deepseek
 
 from typing import TYPE_CHECKING
 import os
@@ -159,6 +160,11 @@ async def discuss_text_handler(message: Message, state: FSMContext):
     task_id = data.get('task_id')
     task = await get_task_by_id(task_id)
 
-    # TODO: write deepseek integration
+    # Получаем ответ от DeepSeek
+    user_question = message.text
+    deepseek_response = deepseek.ask_question_in_chapter(user_question)
+
+    # Отправляем ответ пользователю
+    await message.answer(deepseek_response)
 
     await state.clear()
