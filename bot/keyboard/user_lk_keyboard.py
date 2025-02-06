@@ -13,14 +13,14 @@ async def user_lk_keyboard(user: User, subs: Subscription | None) -> InlineKeybo
                 text="Изменить интересующие темы", callback_data="change_theme")],
             [InlineKeyboardButton(text="🔁 История покупок",
                                   callback_data="purchase_history")],
-            [InlineKeyboardButton(text="🔙 Назад",
+            [InlineKeyboardButton(text="◀️ Назад",
                                   callback_data="main_menu")]
         ])
     else:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔁 История покупок",
                                   callback_data="purchase_history")],
-            [InlineKeyboardButton(text="🔙 Назад",
+            [InlineKeyboardButton(text="◀️ Назад",
                                   callback_data="main_menu")]
         ])
 
@@ -47,7 +47,7 @@ async def history_keyboard(user: User) -> InlineKeyboardMarkup:
     """Generate history keyboard."""
 
     arr = await get_arr(user)
-    arr.append([InlineKeyboardButton(text="🔙 Назад", callback_data="user_lk")])
+    arr.append([InlineKeyboardButton(text="◀️ Назад", callback_data="user_lk")])
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=arr)
     return keyboard
@@ -83,8 +83,8 @@ async def notifications_settings_keyboard(user: User):
     arr, can_be_more = await get_notifications(user)
     if can_be_more:
         arr.append([InlineKeyboardButton(
-            text="Добавить напоминание", callback_data="add_notification")])
-    arr.append([InlineKeyboardButton(text='🔙 Назад', callback_data='user_lk')])
+            text="➕ Добавить напоминание", callback_data="add_notification")])
+    arr.append([InlineKeyboardButton(text='◀️ Назад', callback_data='user_lk')])
 
     return InlineKeyboardMarkup(inline_keyboard=arr)
 
@@ -98,5 +98,5 @@ async def view_notification_keyboard(notification: Notification):
         [InlineKeyboardButton(
             text="❌", callback_data=f"delete_notification_{notification.id}")],
         [InlineKeyboardButton(
-            text="🔙 Назад", callback_data="notifications_settings")]
+            text="◀️ Назад", callback_data="notifications_settings")]
     ])

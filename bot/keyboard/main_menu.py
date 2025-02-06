@@ -31,29 +31,29 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
             if q:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
 
-                    [InlineKeyboardButton(text="Краткая методичка",
+                    [InlineKeyboardButton(text="🧠 Краткая методичка 🧠",
                                           callback_data="short_methodics")],
                     [InlineKeyboardButton(
-                        text="Методичка", callback_data="methodics")],
-                    [InlineKeyboardButton(text="Книга", callback_data="book")],
-                    [InlineKeyboardButton(text="Личный кабинет",
+                        text="🧠 Методичка 🧠", callback_data="methodics")],
+                    [InlineKeyboardButton(text="📚 Книга 📚", callback_data="book")],
+                    [InlineKeyboardButton(text="👤 Личный кабинет 👤",
                                           callback_data="user_lk")],
                     [InlineKeyboardButton(
-                        text="Помощь", callback_data="help")],
+                        text="💬 Помощь 💬", callback_data="help")],
                     [InlineKeyboardButton(
-                        text="Доступ к заданиям", callback_data="tasks")]
+                        text="💪 Доступ к заданиям 💪", callback_data="tasks")]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="Краткая методичка",
+                    [InlineKeyboardButton(text="🧠 Краткая методичка 🧠",
                                           callback_data="short_methodics")],
                     [InlineKeyboardButton(
-                        text="Методичка", callback_data="methodics")],
-                    [InlineKeyboardButton(text="Книга", callback_data="book")],
-                    [InlineKeyboardButton(text="Оформить подписку",
+                        text="🧠 Методичка 🧠", callback_data="methodics")],
+                    [InlineKeyboardButton(text="📚 Книга 📚", callback_data="book")],
+                    [InlineKeyboardButton(text="💰 Оформить подписку 💰",
                                           callback_data="go_on_subscription")],
                     [InlineKeyboardButton(
-                        text="Помощь", callback_data="help")],
+                        text="💬 Помощь 💬", callback_data="help")],
                 ])
         else:
             try:
@@ -68,31 +68,31 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
             if q:
 
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="Краткая методичка",
+                    [InlineKeyboardButton(text="🧠 Краткая методичка 🧠",
                                           callback_data="short_methodics")],
                     [InlineKeyboardButton(
-                        text="Методичка", callback_data="methodics")],
-                    [InlineKeyboardButton(text="Книга", callback_data="book")],
-                    [InlineKeyboardButton(text="Личный кабинет",
+                        text="🧠 Методичка 🧠", callback_data="methodics")],
+                    [InlineKeyboardButton(text="📚 Книга 📚", callback_data="book")],
+                    [InlineKeyboardButton(text="👤 Личный кабинет 👤",
                                           callback_data="user_lk")],
                     [InlineKeyboardButton(
-                        text="Помощь", callback_data="help")],
+                        text="💬 Помощь 💬", callback_data="help")],
                     [InlineKeyboardButton(
-                        text="Доступ к заданиям", callback_data="tasks")]
+                        text="💪 Доступ к заданиям 💪", callback_data="tasks")]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                    [InlineKeyboardButton(text="Краткая методичка",
+                    [InlineKeyboardButton(text="🧠 Краткая методичка 🧠",
                                           callback_data="short_methodics")],
                     [InlineKeyboardButton(
-                        text="Методичка", callback_data="methodics")],
-                    [InlineKeyboardButton(text="Книга", callback_data="book")],
-                    [InlineKeyboardButton(text="Личный кабинет",
+                        text="🧠 Методичка 🧠", callback_data="methodics")],
+                    [InlineKeyboardButton(text="📚 Книга 📚", callback_data="book")],
+                    [InlineKeyboardButton(text="👤 Личный кабинет 👤",
                                           callback_data="user_lk")],
-                    [InlineKeyboardButton(text="Оформить подписку",
+                    [InlineKeyboardButton(text="💰 Оформить подписку 💰",
                                           callback_data="go_on_subscription")],
                     [InlineKeyboardButton(
-                        text="Помощь", callback_data="help")],
+                        text="💬 Помощь 💬", callback_data="help")],
                 ])
 
         return keyboard
