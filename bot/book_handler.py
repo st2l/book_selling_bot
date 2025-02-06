@@ -8,12 +8,12 @@ from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
-from api.user.models import User, Book, History
+from api.user.models import User, Book, History, Rating
 from bot.keyboard import book_keyboard, back_to_main_keyboard
 
 from utils import get_bot_text, identify_user
 
-from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from asgiref.sync import sync_to_async
 
 book_router = Router()
@@ -21,6 +21,7 @@ book_router = Router()
 
 class BookState(StatesGroup):
     purchase = State()
+    rating = State()
 
 
 @book_router.callback_query(F.data == 'book')
@@ -60,6 +61,11 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
     await call.answer()
 
 
+@sync_to_async
+def save_book_rating(user: User, rating: int):
+    Rating.objects.create(user=user, rating=rating)
+
+
 @book_router.message(F.successful_payment, BookState.purchase)
 async def book_payment_handler(message: Message, state: FSMContext):
     user, _ = await identify_user(message)
@@ -71,5 +77,18 @@ async def book_payment_handler(message: Message, state: FSMContext):
     await message.answer_document(
         caption=await get_bot_text(name='Успешная покупка книги'),
         document=FSInputFile(book.material.path),
-        reply_markup=await back_to_main_keyboard()
     )
+    
+    # Ask for rating
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{i}")] for i in range(1, 6)
+    ])
+    
+    await message.answer(
+        text="Пожалуйста, оцените книгу от 1 до 5 звезд:",
+        reply_markup=keyboard
+    )
+    
+    await state.set_state(BookState.rating)
+
+

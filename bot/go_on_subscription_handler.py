@@ -161,7 +161,7 @@ async def rate_subscription(call: CallbackQuery):
 async def rate_subscription(call: CallbackQuery):
     user, is_new = await identify_user(call)
 
-    rate = int(call.data.split('_')[1])
+    rate = int(call.data.split('_')[-1])
     await Rating.objects.acreate(user=user, rating=rate)
 
     await call.message.edit_text(

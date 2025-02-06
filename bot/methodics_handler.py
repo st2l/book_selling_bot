@@ -8,13 +8,13 @@ from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
-from api.user.models import User, Methodic, History
+from api.user.models import User, Methodic, History, Rating
 from bot.keyboard import choose_three_methodics_keyboard, methodic_1_keyboard, \
     back_to_main_keyboard, methodic_2_keyboard, methodic_3_keyboard, methodic_all_keyboard
 
 from utils import get_bot_text, identify_user
 
-from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from asgiref.sync import sync_to_async
 
 methodics_router = Router()
@@ -22,6 +22,7 @@ methodics_router = Router()
 
 class MethodicsStates(StatesGroup):
     methodics_yookassa = State()
+    rating = State()
 
 
 @methodics_router.callback_query(F.data == 'methodics')
@@ -103,26 +104,50 @@ async def process_successful_payment(message: Message, state: FSMContext):
 
             await message.answer_document(
                 caption=await get_bot_text("Методичка куплена успешно"),
-                document=FSInputFile(methodic.material.path),
-                reply_markup=await back_to_main_keyboard()
+                document=FSInputFile(methodic.material.path)
             )
-            await state.clear()
-        return
+            
+            # Запрос оценки для каждой методички
+            keyboard = InlineKeyboardMarkup(inline_keyboard=[
+                [[InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(1, 6)]
+            ])
+            
+            await message.answer(
+                text=f"Пожалуйста, оцените методичку '{methodic.name}' от 1 до 5 звезд:",
+                reply_markup=keyboard
+            )
+    else:
+        user, _ = await identify_user(message)
+        methodic = await Methodic.objects.aget(id=methodic_id)
 
-    user, _ = await identify_user(message)
-    methodic = await Methodic.objects.aget(id=methodic_id)
+        await History.objects.acreate(
+            user=user,
+            methodic=methodic,
+        )
 
-    await History.objects.acreate(
-        user=user,
-        methodic=methodic,
-    )
+        await message.answer_document(
+            caption=await get_bot_text("Методичка куплена успешно"),
+            document=FSInputFile(methodic.material.path)
+        )
+        
+        # Запрос оценки
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(1, 6)
+        ])
+        
+        await message.answer(
+            text="Пожалуйста, оцените методичку от 1 до 5 звезд:",
+            reply_markup=keyboard
+        )
+    
+    await state.set_state(MethodicsStates.rating)
 
-    await message.answer_document(
-        caption=await get_bot_text("Методичка куплена успешно"),
-        document=FSInputFile(methodic.material.path),
-        reply_markup=await back_to_main_keyboard()
-    )
-    await state.clear()
+
+@sync_to_async
+def save_methodic_rating(user: User, rating: int):
+    Rating.objects.create(user=user, rating=rating)
+
+
 
 
 # ########################################################
