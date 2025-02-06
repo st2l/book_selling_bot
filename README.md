@@ -1,140 +1,230 @@
-# Aiogram & Django API Template
-## Based on [Django API Template](https://github.com/MaksimZayats/python-django-template)
+## Проект для продажи "Книг и методичек"
 
----
+### Настройка окружения
 
-## Table of Contents
-- [Feature Highlights](#feature-highlights)
-- [Configuration Guide](#configuration-guide)
-- [Additional Notes](#additional-notes)
-- [Quick Start Guide](#quick-start-guide)
-   - [Setting Up Locally](#setting-up-locally)
-   - [Setting Up with Docker](#setting-up-with-docker)
+```bash
+cp .env.example .env
+```
 
----
+Какие параметры нужно изменить:
 
-## Feature Highlights
+- `SECRET_KEY` - секретный ключ для django
+- `ALLOWED_HOSTS` - разрешенные хосты
+- `TELEGRAM_BOT_TOKEN` - токен для телеграм-бота
+- `DEEPSEEK_API_KEY` - ключ для deepseek
+- `YOOKASSA_TOKEN` - токен для оплаты
+- `DJANGO_ADMIN_PASSWORD` - пароль для админки
 
-This Django API Template is designed to be robust, scalable, and secure, with features that cater to modern application development needs. Here's an overview of the advanced features and how they benefit your project:
+> Убедитесь, что ваш бот подключен к ЮКассе через бота @BotFather
 
-- **[Docker & Docker Compose Integration](https://docs.docker.com/compose/)**: Easily set up and scale your application using Docker containers, ensuring consistent environments across development and production.
+### Как запустить проект
 
-- **[Celery](https://docs.celeryq.dev/en/stable/django/first-steps-with-django.html) with [RabbitMQ](https://rabbitmq.com/) and [Redis](https://redis.io/)**: Leverage Celery for asynchronous task processing, using RabbitMQ as a message broker and Redis as a backend for storing results.
+Запуск проекта происходит через docker compose.
 
-- **[Sentry for Error Tracking](https://sentry.io/)**: Integrate with Sentry for real-time error tracking and monitoring, helping you identify and fix issues rapidly.
+```bash
+docker compose up --build -d
+```
 
-- **[Django Rest Framework (DRF)](https://www.django-rest-framework.org/)**: Use Django Rest Framework for building RESTful APIs, with support for authentication, serialization, and more.
-   - **[DRF Spectacular for OpenAPI](https://drf-spectacular.readthedocs.io/)**: Use DRF Spectacular for OpenAPI documentation, with support for customizing the schema and UI.
-   - **[DRF Simple JWT for Authentication](https://django-rest-framework-simplejwt.readthedocs.io/)**: Use DRF Simple JWT for JSON Web Token authentication, with support for customizing token claims and expiration.
+### Как пользоваться БД
 
-- **[Django CORS Headers](https://pypi.org/project/django-cors-headers/)**: Use Django CORS Headers for handling Cross-Origin Resource Sharing (CORS) headers, with support for customizing origins.
+##### *Пользователи*
 
-- **[Django Silk for Profiling](https://pypi.org/project/django-silk/)**: Utilize Django Silk for profiling and monitoring Django applications, offering insights into performance and optimization.
+Тут хранятся все пользователи, которые зарегистрировались в боте, включая администратора.
+В данной таблице можно менять пользователям права, выдавать им права администратора и так далее.
 
-- **[Django Axes for Security](https://django-axes.readthedocs.io/)**: Use Django Axes for security, with support for blocking brute force attacks and monitoring login attempts.
+Что можно менять:
+- Имя пользователя
+- Пароль
+- Права администратора
 
-- **[AWS S3 Integration](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html)**: Option to use Amazon S3 for static and media file storage, enhancing scalability and performance.
+##### *Тексты бота*
 
-- **Scalability Options**: Configure workers and threads to optimize performance under different load conditions.
+Тут хранятся все тексты, которые используются в боте.
 
-- **Up-to-Date Dependencies**: All dependencies are up-to-date as of the latest release. Thanks to [Dependabot](https://dependabot.com/).
+Что можно менять:
+- Текст сообщения
+ЧТО НЕЛЬЗЯ:
+- Наименование сообщения (оно используется в боте)
 
----
+_Их можно менять, НО нельзя удалять или добавлять новые!_
 
-## Configuration Guide
+##### *Доступные пользователю темы*
 
-The `.env` file is a central place to manage environment variables. It's pre-configured to work with Docker Compose out of the box, without any changes required for initial setup. However, for production deployment, certain secrets must be updated for security reasons.
+Тут хранятся все темы, которые используются в боте.
+Эти темы пользователь может изменять в ЛК, а также при оформлении подписки.
 
-1. **Secrets**:
-   - **PostgreSQL, RabbitMQ, Django Secrets**: These are critical for the security of your application. Ensure to replace the placeholder values with strong, unique passwords.
+Что можно менять:
+- Название темы (и это все что есть в таблице вообще)
 
-2. **Ports**:
-   - **API Port and RabbitMQ Dashboard Port**: Set these ports according to your infrastructure needs. They are exposed to the host machine.
+_Их можно менять, НО нельзя удалять или добавлять новые!_
 
-3. **Performance Tuning**:
-   - **Workers and Threads**: Adjust these values based on your server's capacity and expected load.
+##### *Тарифы подписок*
 
-4. **Application Settings**:
-   - **Host and Environment**: Set these to match your deployment environment.
-   - **Debug and Logging**: Control debug mode and log levels. Set `DJANGO_DEBUG` to `false` in production.
-   - **Localization**: Configure `LANGUAGE_CODE` and `TIME_ZONE` as per your requirements.
+Что можно менять:
+- Наименование подписки
+- Описание подписки
+- Цена подписки
+ЧТО НЕЛЬЗЯ:
+- Количество дней
 
-5. **CORS and CSRF Settings**:
-   - Configure these settings to enhance the security of your application by specifying trusted origins.
+Тут хранятся все тарифы подписок, которые используются в боте.
+_Их можно менять, НО нельзя удалять или добавлять новые!_
 
-6. **Database Configuration**:
-   - **Postgres Connection**: Set up the database connection using the `DATABASE_URL` variable.
+##### *Пользовательские подписки*
 
----
+Что можно менять:
+- ничего
 
-## Additional Notes
-- **Security**: Always prioritize security, especially when handling environment variables and secrets.
-- **Scalability**: Adjust the Docker and Celery configurations as your application scales.
-- **Monitoring**: Regularly monitor the performance and health of your application using integrated tools like Sentry and Silk.
+ЧТО НЕЛЬЗЯ:
+- всё
 
-By following this guide and utilizing the advanced features, you'll be able to set up a powerful, efficient, and secure Django API environment. Happy coding!
+В этом классе хранится информация о купленных подписках пользователей.
+Их нельзя менять, иначе пользователи потеряют доступ к контенту, что приведет к недовольству.
 
----
+##### *Выбранные пользователем темы*
 
-## Quick Start Guide
+Что можно менять:
+- ничего
 
-### Setting Up Locally
+Тут хранится информация о том, какие темы выбрал пользователь.
+Их нельзя менять, иначе пользователи потеряют доступ к контенту (или не тому которому хотели), что приведет к недовольству.
 
-#### 1. Repository Initialization
-   - **Clone the Repository**
+##### *Главы и задания к ним*
 
-#### 2. Environment Setup
-   - **Create a Virtual Environment**:
-     ```bash
-     python3.12 -m venv .venv
-     ```
-   - **Activate the Virtual Environment**:
-     ```bash
-     source .venv/bin/activate
-     ```
+Что можно менять:
+- Номер главы
+- Номер задания
 
-#### 3. Configuration
-   - **Environment Variables**:
-     - Copy the example environment file:
-       ```bash
-       cp .env.example .env
-       ```
-     - _Note: The API can operate without this step, but configuring the environment variables is recommended for full functionality._
+ЧТО НЕЛЬЗЯ:
+- Ничего
 
-#### 4. Dependency Management
-   - **Install Dependencies**:
-     ```bash
-     pip install -r requirements-dev.txt
-     ```
+Тут хранятся все главы и задания к ним.
+Прошу также учесть, что номер главы должен быть уникальным для каждого элемента, а то могут возникнуть проблемы. Предусмотрена работа с 1-7 главами.
 
-#### 5. Database Setup
-   - **Run Migrations**:
-     ```bash
-     make migrate
-     ```
+##### *Ежедневные диалог-задания*
 
-#### 6. Launching the Server
-   - **Start the Local Server**:
-     ```bash
-     make run.server.local
-     ```
+Тут хранится информация о ежедневных диалог-заданиях.
+Это задания которые появляются в 10 и 22 часов, меняются ежедневно, в зависимости от того, какой день у пользователя имеется подписка.
 
-#### 7. Launching the bot
-   - **Start the bot**:
-     ```bash
-     make run.bot.local
-     ```
+Что можно менять:
+- День
+- Сообщение
+- Время дня (утро или вечер, т.е. 10 или 22)
 
-### Setting Up with Docker
+ЧТО НЕЛЬЗЯ:
+- Ничего
 
-#### 1. Repository Initialization
-   - **Clone the Repository**
+##### *Истории покупок*
 
-#### 2. Configuration
-   - Follow the steps in the [Configuration Guide](#configuration-guide) to set up the `.env` file.
+Тут хранятся все истории покупок.
 
-#### 3. Docker Compose
-   - **Run Docker Compose**:
-     ```bash
-     docker compose up -d
-     ```
+Что можно менять:
+- Ничего
+
+ЧТО НЕЛЬЗЯ:
+- Всё
+
+В этом классе хранится информация о том, какие товары (методички, краткие методички, книги) были куплены пользователями.
+Их нельзя менять, иначе пользователи потеряют доступ к контенту, что приведет к недовольству.
+
+##### *Книги*
+
+Тут хранятся все книги.
+Прошу заметить, что согласно функционалу, предусмотрена ОДНА книга.
+
+Что можно менять:
+- Наименование книги
+- Цена книги
+- Описание книги
+- Material (файл книги) _ОБЯЗАТЕЛЬНО ДОЛЖЕН БЫТЬ ПРИСВОЕН_
+
+ЧТО НЕЛЬЗЯ:
+- Ничего
+
+_Прошу заметить, что материал книги должен быть присвоен, иначе книга не будет работать._
+_Также создание новых книг не предусмотрено._
+
+##### *Краткие методички*
+
+Тут хранятся все краткие методички, а именно одна штука.
+
+Что можно менять:
+- Наименование методички
+- Цена методички
+- Описание методички
+- Material (файл методички) _ОБЯЗАТЕЛЬНО ДОЛЖЕН БЫТЬ ПРИСВОЕН_
+
+_Прошу заметить, что материал методички должен быть присвоен, иначе методичка не будет работать._
+_Также создание новых методичек не предусмотрено._
+
+##### *Методички*
+
+Тут хранятся все методички.
+
+Что можно менять:
+- Наименование методички
+- Цена методички
+- Описание методички
+- Material (файл методички) _ОБЯЗАТЕЛЬНО ДОЛЖЕН БЫТЬ ПРИСВОЕН_
+
+_Прошу заметить, что материал методички должен быть присвоен, иначе методичка не будет работать._
+_Также создание новых методичек не предусмотрено._ Изначально их 3 штуки.
+
+##### *Ответы на диалоги*
+
+Тут находится информация о том, какие ответы на диалоги были выбраны пользователями.
+
+Что можно менять:
+- Ничего
+
+ЧТО НЕЛЬЗЯ:
+- Всё
+
+##### *Оценки пользователей*
+
+Тут находится информация о том, какие оценки пользователей были выставлены.
+
+Что можно менять:
+- Ничего
+
+ЧТО НЕЛЬЗЯ:
+- Всё
+
+##### *Пользовательские уведомления*
+
+Тут хранятся все уведомления, которые созданы пользователями.
+
+Что можно менять:
+- Ничего
+
+ЧТО НЕЛЬЗЯ:
+- Всё
+
+##### *Решенные пользователем задания*
+
+Тут находится информация о том, какие задания были решены пользователями.
+
+Что можно менять:
+- Ничего
+
+ЧТО НЕЛЬЗЯ:
+- Всё
+
+##### *Сообщения для рассылки*
+
+Тут можно создавать рассылку для пользователей.
+
+
+Данные параметры обязательно надо выбрать:
+- Сообщение
+- Дата отправки
+- Тип темы (это темы, которые выбрал пользователь при оформлении подписки)
+- Для всех тем (чекбокс, который отправляет сообщение всем пользователям, которые обладают подпиской независимо от того, какие темы они выбрали)
+- Фото 1 ... Фото 5 (опционально) Эти фото будут прикреплены к сообщению
+- Видео 1 ... Видео 3 (опционально) Эти видео   будут прикреплены к сообщению
+- Тип кнопки (тут есть несколько типов кнопок, которые можно выбрать, а также можно выбрать "Нет кнопки" и тогда ее не будет в сообщении)
+
+ЧТО НЕЛЬЗЯ:
+- Ничего
+
+
