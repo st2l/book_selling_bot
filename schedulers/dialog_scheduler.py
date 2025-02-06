@@ -39,7 +39,7 @@ async def check_and_send_dialogs():
     current_hour = now.hour
     
     # Определяем время дня TODO: change for production
-    time_of_day = "утро" if current_hour == now.hour else "вечер"
+    time_of_day = "утро" if current_hour == 10 else "вечер"
     
     logging.info(f'Checking dialogs for {time_of_day}')
     

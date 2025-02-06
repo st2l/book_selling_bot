@@ -1,5 +1,5 @@
 while true; do
-    python manage.py runserver
+    python manage.py runserver --insecure --noreload
 
     # Check the exit status of the command
     if [ $? -eq 0 ]; then
