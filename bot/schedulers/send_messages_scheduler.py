@@ -24,7 +24,7 @@ def mark_message_as_sent(message: SendMessage):
 @sync_to_async
 def get_users_by_theme(message: SendMessage):
     theme = message.theme_type
-    return User.objects.filter(theme__theme_type=theme)
+    return list(User.objects.filter(theme__theme_type=theme))
 
 
 @sync_to_async

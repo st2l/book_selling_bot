@@ -107,15 +107,6 @@ async def process_successful_payment(message: Message, state: FSMContext):
                 document=FSInputFile(methodic.material.path)
             )
             
-            # Запрос оценки для каждой методички
-            keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [[InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(1, 6)]
-            ])
-            
-            await message.answer(
-                text=f"Пожалуйста, оцените методичку '{methodic.name}' от 1 до 5 звезд:",
-                reply_markup=keyboard
-            )
     else:
         user, _ = await identify_user(message)
         methodic = await Methodic.objects.aget(id=methodic_id)
@@ -130,15 +121,16 @@ async def process_successful_payment(message: Message, state: FSMContext):
             document=FSInputFile(methodic.material.path)
         )
         
-        # Запрос оценки
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(1, 6)
-        ])
-        
-        await message.answer(
-            text="Пожалуйста, оцените методичку от 1 до 5 звезд:",
-            reply_markup=keyboard
-        )
+    # Запрос оценки
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(1, 6)
+    ])
+    
+    await message.bot.send_message(
+        chat_id=user.id,
+        text="Пожалуйста, оцените методичку от 1 до 5 звезд:",
+        reply_markup=keyboard
+    )
     
     await state.set_state(MethodicsStates.rating)
 
