@@ -6,7 +6,7 @@ from django.contrib import admin
 
 from api.user.models import User, BotText, Subscription, Methodic, ShortMethodic, \
     Book, History, Task, TaskSolved, SubscriptionDetails, Theme, ThemePool, Notification, Rating, \
-    SendMessage
+    SendMessage, DialogResponse, DialogTask
 
 
 @admin.register(User)
@@ -106,3 +106,13 @@ class RatingAdmin(admin.ModelAdmin):
 @admin.register(SendMessage)
 class SendMessageAdmin(admin.ModelAdmin):
     list_display = ("message", "date_to_send", "theme_type")
+
+
+@admin.register(DialogResponse)
+class DialogResponseAdmin(admin.ModelAdmin):
+    list_display = ("user", "dialog_task", "response_text")
+
+
+@admin.register(DialogTask)
+class DialogTaskAdmin(admin.ModelAdmin):
+    list_display = ("day_number", "message")

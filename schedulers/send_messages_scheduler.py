@@ -94,7 +94,7 @@ async def send_message_to_users(message: SendMessage, users):
 
 
 async def check_and_send_messages():
-    asyncio.sleep(5)
+    await asyncio.sleep(5)
     logging.info('Checking messages to send')
 
     messages = await get_messages_to_send()

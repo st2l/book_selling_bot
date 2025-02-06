@@ -20,6 +20,7 @@ from bot.go_on_subscription_handler import go_on_subscription_router
 from bot.user_lk_handler import user_lk_router
 from bot.tasks_handler import tasks_router
 from bot.admin import admin_router
+from bot.dialog_handler import dialog_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -28,7 +29,8 @@ from api.user.models import BotText
 # FOR SCHEDULER
 from schedulers import check_and_send_notifications, \
     check_and_notify_subscriptions, \
-    check_and_send_messages
+    check_and_send_messages, \
+    check_and_send_dialogs
 
 from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -47,7 +49,7 @@ dispatcher.include_router(go_on_subscription_router)
 dispatcher.include_router(user_lk_router)
 dispatcher.include_router(tasks_router)
 dispatcher.include_router(admin_router)
-
+dispatcher.include_router(dialog_router)
 
 async def set_bot_commands() -> None:
     await bot.set_my_commands(
@@ -457,10 +459,13 @@ async def create_default_subscriptions():
 
 
 def start_scheduler():
+    # TODO: change for production
+
     scheduler = AsyncIOScheduler()
     scheduler.add_job(check_and_send_notifications, 'interval', minutes=1)
     scheduler.add_job(check_and_send_messages, 'interval', minutes=1)
     scheduler.add_job(check_and_notify_subscriptions, 'cron', hour=0, minute=0)
+    scheduler.add_job(check_and_send_dialogs, 'interval', minutes=1)
     scheduler.start()
 
 

@@ -171,3 +171,26 @@ class SendMessage(models.Model):
 
     def __str__(self):
         return self.message
+
+
+class DialogTask(models.Model):
+    day_number = models.IntegerField()  # День отправки (1-90)
+    message = models.TextField()  # Сообщение с заданием
+    time_of_day = models.CharField(
+        max_length=10,
+        choices=[('утро', 'Утро'), ('вечер', 'Вечер')]
+    )
+
+    def __str__(self):
+        return f"День {self.day_number} - {self.time_of_day}"
+
+
+class DialogResponse(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    dialog_task = models.ForeignKey(DialogTask, on_delete=models.CASCADE)
+    response_text = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - День {self.dialog_task.day_number}"
