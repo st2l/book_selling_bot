@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 from os import environ, getenv
 
-from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from api.config.application import ENVIRONMENT
@@ -26,7 +25,6 @@ if USE_SENTRY:
         environment=ENVIRONMENT,
         integrations=[
             DjangoIntegration(),
-            CeleryIntegration(),
         ],
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.

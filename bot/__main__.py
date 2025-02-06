@@ -480,8 +480,6 @@ async def on_startup() -> None:
     # CREATION OF DEFAULT THEMES
     await create_default_themes()
 
-    # START SCHEDULER
-    start_scheduler()
 
 
 async def run_polling() -> None:

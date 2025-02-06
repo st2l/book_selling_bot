@@ -13,8 +13,6 @@ services:
       - pgbouncer
       - migrations
       - collectstatic
-      - redis
-      - rabbitmq
     restart: always
     volumes:
       - .:/application
@@ -69,43 +67,10 @@ services:
     networks:
       - main
 
-  redis:
-    image: redis:latest
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    networks:
-      - main
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    restart: unless-stopped
-    environment:
-        RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
-        RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-    ports:
-      - "${RABBITMQ_DASHBOARD_PORT:-15672}:15672"
-    networks:
-      - main
-
-  celery:
-    build: .
-    command: make run.celery.prod
-    restart: unless-stopped
-    depends_on:
-      - api
-    volumes:
-      - .:/application
-    networks:
-      - main
-
   migrations:
     build: .
     command: make makemigrations && make migrate
     depends_on:
-
       - db
     volumes:
       - .:/application
@@ -130,5 +95,3 @@ networks:
 volumes:
   postgres-data:
   pgbouncer-data:
-  redis-data:
-  rabbitmq-data:
