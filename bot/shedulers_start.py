@@ -7,7 +7,7 @@ def start_scheduler():
     scheduler = AsyncIOScheduler()
     scheduler.add_job(check_and_send_notifications, 'interval', minutes=1)
     scheduler.add_job(check_and_send_messages, 'cron', minute='*', second=30)
-    scheduler.add_job(check_and_notify_subscriptions, 'cron', hour=0, minute=0)
+    scheduler.add_job(check_and_notify_subscriptions, 'interval', minutes=1)
     scheduler.add_job(check_and_send_dialogs, 'cron', hour='10,22', minute=0)
 
     scheduler.start()
