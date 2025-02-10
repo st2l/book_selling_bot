@@ -7,6 +7,7 @@ async def user_lk_keyboard(user: User, subs: Subscription | None) -> InlineKeybo
     """Generate user lk keyboard."""
     if subs:
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🔄 Продлить подписку", callback_data="renew_subscription")],
             [InlineKeyboardButton(text="⏰ Изменить напоминания",
                                   callback_data="notifications_settings")],
             [InlineKeyboardButton(

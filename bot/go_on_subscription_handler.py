@@ -8,9 +8,9 @@ from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
-from api.user.models import User, SubscriptionDetails, Subscription, Theme, ThemePool, Rating
+from api.user.models import User, SubscriptionDetails, Subscription, Theme, ThemePool, Rating, SubscriptionRenewal
 from bot.keyboard import go_on_subscription_keyboard, back_to_main_keyboard, \
-    subscription_purchased_keyboard, rate_subscription_keyboard, theme_chosen_keyboard
+    subscription_purchased_keyboard, rate_subscription_keyboard, theme_chosen_keyboard, subscription_renewal_keyboard
 
 from utils import get_bot_text, identify_user
 
@@ -170,3 +170,62 @@ async def rate_subscription(call: CallbackQuery):
     )
 
     await call.answer()
+
+
+@go_on_subscription_router.callback_query(F.data == 'renew_subscription')
+async def renew_subscription_handler(call: CallbackQuery):
+    user, is_new = await identify_user(call)
+    
+    await call.message.edit_text(
+        text="Выберите тариф для продления подписки:",
+        reply_markup=await subscription_renewal_keyboard()
+    )
+
+class RenewSubscriptionStates(StatesGroup):
+    subscription_type = State()
+
+@go_on_subscription_router.callback_query(F.data.startswith('renew_'))
+async def process_renewal_handler(call: CallbackQuery, state: FSMContext):
+    user, is_new = await identify_user(call)
+    await call.answer()
+    
+    subscription_type = ''.join(call.data.split('_')[-1])
+    logging.info(subscription_type)
+    subs_id = 1 if subscription_type == '1week' else (2 if subscription_type == '1month' else 3)
+    
+    subs = await SubscriptionDetails.objects.aget(id=subs_id)
+    
+    await call.bot.send_invoice(
+        chat_id=call.from_user.id,
+        title=f"Продление подписки - {subs.name}",
+        description=subs.description,
+        payload='subscription_renewal',
+        provider_token=os.getenv('YOOKASSA_TOKEN'),
+        currency='RUB',
+        prices=[LabeledPrice(label=subs.name, amount=subs.price * 100)],
+        need_email=True,
+        send_email_to_provider=True,
+        start_parameter='create_invoice',
+    )
+    
+    await state.set_state(RenewSubscriptionStates.subscription_type)
+    await state.update_data(subscription_type=subs)
+
+
+@go_on_subscription_router.message(F.successful_payment, RenewSubscriptionStates.subscription_type)
+async def renewal_purchased(message: Message, state: FSMContext):
+    user, is_new = await identify_user(message)
+    
+    data = await state.get_data()
+    subs = data['subscription_type']
+    
+    await SubscriptionRenewal.objects.acreate(
+        user=user,
+        subscription_type=subs,
+    )
+    
+    await message.answer(
+        text="Подписка успешно продлена! Она активируется автоматически после окончания текущей подписки.",
+        reply_markup=await back_to_main_keyboard()
+    )
+    await state.clear()

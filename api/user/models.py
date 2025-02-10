@@ -266,3 +266,16 @@ class DialogResponse(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - День {self.dialog_task.day_number}"
+
+
+class SubscriptionRenewal(models.Model):
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    subscription_type = models.ForeignKey(SubscriptionDetails, verbose_name='Тариф подписки', on_delete=models.CASCADE)
+    date_of_creation = models.DateTimeField('Дата создания', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Продление подписки'
+        verbose_name_plural = 'Продления подписок'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.subscription_type}"

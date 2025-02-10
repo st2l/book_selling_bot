@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from asgiref.sync import sync_to_async
-from api.user.models import Subscription, SubscriptionDetails, User, Notification, Theme, DialogResponse
+from api.user.models import Subscription, SubscriptionDetails, User, Notification, Theme, DialogResponse, SubscriptionRenewal
 from bot.bot_instance import bot
 import logging
 import pytz
@@ -59,39 +59,68 @@ def save_responses_to_file(text: str, username: str):
     return filepath
 
 
+@sync_to_async
+def get_subscription_renewal(user: User):
+    return SubscriptionRenewal.objects.filter(user=user).first()
+
+
+@sync_to_async
+def delete_subscription_renewal(renewal: SubscriptionRenewal):
+    renewal.delete()
+
+
 async def check_and_notify_subscriptions():
     logging.info('Checking subscriptions')
-
+    
     now = datetime.now(pytz.utc)
     subscriptions = await get_active_subscriptions()
-
+    
     async for subscription in subscriptions:
         user = await get_user_from_subscription(subscription)
         subscription_details = await get_subscription_details(subscription)
         subscription_end_date = subscription.date_of_creation + \
             timedelta(days=subscription_details.days)
         days_left = (subscription_end_date - now).days
-
+        
         logging.info(f"User {user.username} has {days_left} days left")
-
+        
         if days_left == 2:
             await bot.send_message(chat_id=user.username, text="Ваша подписка заканчивается через 2 дня.")
         elif days_left <= 0:
-            # Get and format dialog responses
-            responses = await get_user_dialog_responses(user)
-            formatted_text = await format_dialog_responses(responses)
-            filepath = await save_responses_to_file(formatted_text, user.username)
+            # Check for renewal
+            renewal = await get_subscription_renewal(user)
             
-            # Send end subscription message and responses file
-            await bot.send_message(chat_id=user.username, text="Ваша подписка закончилась.")
-            await bot.send_document(
-                chat_id=user.username,
-                document=FSInputFile(filepath),
-                caption="Ваши ответы на диалоги за время подписки"
-            )
-            
-            # Delete subscription and cleanup
-            await delete_subscription(subscription)
-            
-            # Clean up the temporary file
-            os.remove(filepath)
+            if renewal:
+                # Create new subscription
+                await Subscription.objects.acreate(
+                    user=user,
+                    subscription_type=renewal.subscription_type,
+                )
+                
+                # Delete old subscription and renewal
+                await delete_subscription(subscription)
+                await delete_subscription_renewal(renewal)
+                
+                await bot.send_message(
+                    chat_id=user.username,
+                    text=f"Ваша подписка закончилась и была автоматически продлена на {renewal.subscription_type.name}."
+                )
+            else:
+                # Get and format dialog responses
+                responses = await get_user_dialog_responses(user)
+                formatted_text = await format_dialog_responses(responses)
+                filepath = await save_responses_to_file(formatted_text, user.username)
+                
+                # Send end subscription message and responses file
+                await bot.send_message(chat_id=user.username, text="Ваша подписка закончилась.")
+                await bot.send_document(
+                    chat_id=user.username,
+                    document=FSInputFile(filepath),
+                    caption="Ваши ответы на диалоги за время подписки"
+                )
+                
+                # Delete subscription and cleanup
+                await delete_subscription(subscription)
+                
+                # Clean up the temporary file
+                os.remove(filepath)
