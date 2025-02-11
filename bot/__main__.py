@@ -21,6 +21,7 @@ from bot.user_lk_handler import user_lk_router
 from bot.tasks_handler import tasks_router
 from bot.admin import admin_router
 from bot.dialog_handler import dialog_router
+from bot.like_minded_chat_handler import like_minded_chat_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -47,6 +48,7 @@ dispatcher.include_router(user_lk_router)
 dispatcher.include_router(tasks_router)
 dispatcher.include_router(admin_router)
 dispatcher.include_router(dialog_router)
+dispatcher.include_router(like_minded_chat_router)
 
 async def set_bot_commands() -> None:
     await bot.set_my_commands(
@@ -324,6 +326,24 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Время уведомления изменено",
                 text="🔔<b>Изменение времени уведомления</b>🔔\n\nВведите новое время для вашего напоминания в формате ЧЧ:ММ (по МСК):",
+            )
+
+        # Add new default text for like-minded chat
+        try:
+            q = await BotText.objects.aget(name='Текст для чата единомышленников')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Текст для чата единомышленников",
+                text="Присоединяйтесь к нашему чату единомышленников!\n\nЗдесь вы сможете общаться с людьми, которые разделяют ваши интересы и цели.",
+            )
+        
+        # Add new default link for like-minded chat
+        try:
+            q = await BotText.objects.aget(name='Ссылка для чата единомышленников')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Ссылка для чата единомышленников",
+                text="https://t.me/joinchat/AAAAAED000000000",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")

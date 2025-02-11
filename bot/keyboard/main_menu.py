@@ -41,7 +41,8 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                     [InlineKeyboardButton(
                         text="💬 Помощь 💬", callback_data="help")],
                     [InlineKeyboardButton(
-                        text="💪 Доступ к заданиям 💪", callback_data="tasks")]
+                        text="💪 Доступ к заданиям 💪", callback_data="tasks")],
+                    [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -54,6 +55,7 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                                           callback_data="go_on_subscription")],
                     [InlineKeyboardButton(
                         text="💬 Помощь 💬", callback_data="help")],
+                    [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
         else:
             try:
@@ -78,7 +80,8 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                     [InlineKeyboardButton(
                         text="💬 Помощь 💬", callback_data="help")],
                     [InlineKeyboardButton(
-                        text="💪 Доступ к заданиям 💪", callback_data="tasks")]
+                        text="💪 Доступ к заданиям 💪", callback_data="tasks")],
+                    [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
             else:
                 keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -93,6 +96,7 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                                           callback_data="go_on_subscription")],
                     [InlineKeyboardButton(
                         text="💬 Помощь 💬", callback_data="help")],
+                    [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
 
         return keyboard
