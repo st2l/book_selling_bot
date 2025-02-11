@@ -42,6 +42,7 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                         text="💬 Помощь 💬", callback_data="help")],
                     [InlineKeyboardButton(
                         text="💪 Доступ к заданиям 💪", callback_data="tasks")],
+                    [InlineKeyboardButton(text="🎯 Реферальная программа", callback_data="referral_program")],
                     [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
             else:
@@ -55,6 +56,7 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                                           callback_data="go_on_subscription")],
                     [InlineKeyboardButton(
                         text="💬 Помощь 💬", callback_data="help")],
+                    [InlineKeyboardButton(text="🎯 Реферальная программа", callback_data="referral_program")],
                     [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
         else:
@@ -81,6 +83,7 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                         text="💬 Помощь 💬", callback_data="help")],
                     [InlineKeyboardButton(
                         text="💪 Доступ к заданиям 💪", callback_data="tasks")],
+                    [InlineKeyboardButton(text="🎯 Реферальная программа", callback_data="referral_program")],
                     [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
             else:
@@ -96,6 +99,7 @@ async def main_menu(user: User) -> InlineKeyboardMarkup:
                                           callback_data="go_on_subscription")],
                     [InlineKeyboardButton(
                         text="💬 Помощь 💬", callback_data="help")],
+                    [InlineKeyboardButton(text="🎯 Реферальная программа", callback_data="referral_program")],
                     [InlineKeyboardButton(text="💭 Чат единомышленников", callback_data="like_minded_chat")]
                 ])
 

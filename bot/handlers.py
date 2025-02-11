@@ -6,11 +6,13 @@ from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiogram.filters import CommandObject
 
-from api.user.models import User
+from api.user.models import User, Refer
 from bot.keyboard import main_menu
 
 from utils import get_bot_text, identify_user
+import logging
 
 if TYPE_CHECKING:
     from aiogram.types import Message
@@ -28,11 +30,24 @@ class StartPainState(StatesGroup):
 
 
 @router.message(Command(commands=["start"]))
-async def handle_start_command(message: Message, state: FSMContext) -> None:
+async def handle_start_command(message: Message, state: FSMContext, command: CommandObject) -> None:
     if message.from_user is None:
         return
 
     user, is_new = await identify_user(message)
+
+    if is_new and message.text and len(message.text.split()) > 1:
+        referrer_username = command.args
+        logging.info(f"Referrer username: {referrer_username}")
+        try:
+            referrer = await User.objects.aget(username=referrer_username)
+            if referrer.id != user.id:  # Prevent self-referral
+                await Refer.objects.aget_or_create(
+                    refer_user=referrer,
+                    invited_user=user
+                )
+        except User.DoesNotExist:
+            pass
 
     # TODO: ADD usage of is_new variable
     await message.answer(text=(await get_bot_text(name='start_text_pain')).replace('{}', message.from_user.first_name))

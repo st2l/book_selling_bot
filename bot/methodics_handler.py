@@ -11,6 +11,7 @@ from aiogram.fsm.context import FSMContext
 from api.user.models import User, Methodic, History, Rating
 from bot.keyboard import choose_three_methodics_keyboard, methodic_1_keyboard, \
     back_to_main_keyboard, methodic_2_keyboard, methodic_3_keyboard, methodic_all_keyboard
+from bot.check_and_process_referal import check_and_process_referral
 
 from utils import get_bot_text, identify_user
 
@@ -91,6 +92,9 @@ async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
 async def process_successful_payment(message: Message, state: FSMContext):
     data = await state.get_data()
     methodic_id = data.get('methodic_id')
+    user, _ = await identify_user(message)
+
+    await check_and_process_referral(user)
 
     # if ALL methodics
     if methodic_id == "Все методички":

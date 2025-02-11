@@ -11,6 +11,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from api.user.models import User, ShortMethodic, History, Rating
 from bot.keyboard import short_methodics_keyboard, short_methodics_purchase_keyboard, back_to_main_keyboard
+from bot.check_and_process_referal import check_and_process_referral
 
 from utils import get_bot_text, identify_user
 from asgiref.sync import sync_to_async
@@ -92,6 +93,7 @@ async def short_methodics_payment_success(message: Message, state: FSMContext):
     user, _ = await identify_user(message)
     short_methodic = await ShortMethodic.objects.aget(id=1)
     
+    await check_and_process_referral(user)
     await History.objects.acreate(user=user, short_methodic=short_methodic)
 
     # Send methodic

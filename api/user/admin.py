@@ -6,7 +6,7 @@ from django.contrib import admin
 
 from api.user.models import User, BotText, Subscription, Methodic, ShortMethodic, \
     Book, History, Task, TaskSolved, SubscriptionDetails, Theme, ThemePool, Notification, Rating, \
-    SendMessage, DialogResponse, DialogTask, SubscriptionRenewal
+    SendMessage, DialogResponse, DialogTask, SubscriptionRenewal, Refer
 
 
 @admin.register(User)
@@ -123,3 +123,8 @@ class SubscriptionRenewalAdmin(admin.ModelAdmin):
     list_display = ("user", "subscription_type", "date_of_creation")
     list_filter = ("subscription_type", "date_of_creation")
     search_fields = ("user__username",)
+
+
+@admin.register(Refer)
+class ReferAdmin(admin.ModelAdmin):
+    list_display = ("refer_user", "invited_user", "bought")

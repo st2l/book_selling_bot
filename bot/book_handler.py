@@ -16,6 +16,8 @@ from utils import get_bot_text, identify_user
 from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from asgiref.sync import sync_to_async
 
+from bot.check_and_process_referal import check_and_process_referral
+
 book_router = Router()
 
 
@@ -72,6 +74,7 @@ async def book_payment_handler(message: Message, state: FSMContext):
     book = await Book.objects.aget(id=1)
     await state.clear()
 
+    await check_and_process_referral(user)
     history = await History.objects.acreate(user=user, book=book)
 
     await message.answer_document(

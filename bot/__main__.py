@@ -22,6 +22,7 @@ from bot.tasks_handler import tasks_router
 from bot.admin import admin_router
 from bot.dialog_handler import dialog_router
 from bot.like_minded_chat_handler import like_minded_chat_router
+from bot.referral_handler import referral_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -49,7 +50,7 @@ dispatcher.include_router(tasks_router)
 dispatcher.include_router(admin_router)
 dispatcher.include_router(dialog_router)
 dispatcher.include_router(like_minded_chat_router)
-
+dispatcher.include_router(referral_router)
 async def set_bot_commands() -> None:
     await bot.set_my_commands(
         [
@@ -81,7 +82,7 @@ async def create_all_default_bot_texts() -> None:
             q = await BotText.objects.aget(name='Стартовое сообщение и рекомендацию по использованию подписки')
         except:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
-                name="Стартовое сообщение и рекомендацию по использованию подписки",
+                name="Стартовое сообщение и рекомендацию по использованию подпиской",
                 text="Предлагаю тебе выбрать способ решения, но прежде чем выбрать прочти до конца. (Краткая рекомендация по использованию подпиской)",
             )
 
@@ -344,6 +345,15 @@ async def create_all_default_bot_texts() -> None:
             await sync_to_async(BotText.objects.create, thread_sensitive=True)(
                 name="Ссылка для чата единомышленников",
                 text="https://t.me/joinchat/AAAAAED000000000",
+            )
+
+        # Add referral program texts
+        try:
+            q = await BotText.objects.aget(name='Реферальная программа')
+        except:
+            await sync_to_async(BotText.objects.create, thread_sensitive=True)(
+                name="Реферальная программа",
+                text="Приглашайте друзей и получайте бонусы!\n\nЗа каждого купившего друга вы получите 7 дней подписки.",
             )
     except Exception as e:
         logging.error(f"Error while creating default bot texts: {e}")

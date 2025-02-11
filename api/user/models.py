@@ -279,3 +279,20 @@ class SubscriptionRenewal(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.subscription_type}"
+
+
+class Refer(models.Model):
+    refer_user = models.ForeignKey(User, verbose_name='Пригласивший пользователь', 
+                                 on_delete=models.CASCADE, related_name='referrals')
+    invited_user = models.ForeignKey(User, verbose_name='Приглашенный пользователь', 
+                                   on_delete=models.CASCADE, related_name='invited_by')
+    bought = models.BooleanField('Совершил покупку', default=False)
+    date_created = models.DateTimeField('Дата приглашения', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Реферал'
+        verbose_name_plural = 'Рефералы'
+        unique_together = ('refer_user', 'invited_user')
+
+    def __str__(self):
+        return f"{self.refer_user.username} пригласил {self.invited_user.username}"

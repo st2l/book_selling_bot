@@ -11,7 +11,7 @@ from aiogram.fsm.context import FSMContext
 from api.user.models import User, SubscriptionDetails, Subscription, Theme, ThemePool, Rating, SubscriptionRenewal
 from bot.keyboard import go_on_subscription_keyboard, back_to_main_keyboard, \
     subscription_purchased_keyboard, rate_subscription_keyboard, theme_chosen_keyboard, subscription_renewal_keyboard
-
+from bot.check_and_process_referal import check_and_process_referral
 from utils import get_bot_text, identify_user
 
 from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile
@@ -121,6 +121,8 @@ async def subsription_purchased(message: Message, state: FSMContext):
         subscription_type=subs,
     )
 
+    await check_and_process_referral(user)
+
     await message.answer(
         text=await get_bot_text('Подписка успешно оформлена'),
         reply_markup=await subscription_purchased_keyboard(),
@@ -219,6 +221,7 @@ async def renewal_purchased(message: Message, state: FSMContext):
     data = await state.get_data()
     subs = data['subscription_type']
     
+    await check_and_process_referral(user)
     await SubscriptionRenewal.objects.acreate(
         user=user,
         subscription_type=subs,
