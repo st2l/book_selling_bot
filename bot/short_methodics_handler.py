@@ -102,11 +102,11 @@ async def short_methodics_payment_success(message: Message, state: FSMContext):
     
     # Ask for rating
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{i}")] for i in range(1, 6)
+        [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{i}")] for i in range(5, 0, -1)
     ])
     
     await message.answer(
-        text="Пожалуйста, оцените методичку от 1 до 5 звезд:",
+        text="Пожалуйста, оцените сервис от 1 до 5 звезд:",
         reply_markup=keyboard
     )
     

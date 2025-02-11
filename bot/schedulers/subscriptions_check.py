@@ -68,6 +68,7 @@ def get_subscription_renewal(user: User):
 def delete_subscription_renewal(renewal: SubscriptionRenewal):
     renewal.delete()
 
+sended = set()
 
 async def check_and_notify_subscriptions():
     logging.info('Checking subscriptions')
@@ -84,9 +85,14 @@ async def check_and_notify_subscriptions():
         
         logging.info(f"User {user.username} has {days_left} days left")
         
-        if days_left == 2:
+        if user.username in sended:
+            logging.info('User has been already notificated!')
+
+        if days_left == 2 and (user.username not in sended):
             await bot.send_message(chat_id=user.username, text="Ваша подписка заканчивается через 2 дня.")
+            sended.add(user.username)
         elif days_left <= 0:
+            sended.remove(user.username)
             # Check for renewal
             renewal = await get_subscription_renewal(user)
             

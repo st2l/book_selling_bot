@@ -35,7 +35,7 @@ async def handle_start_command(message: Message, state: FSMContext) -> None:
     user, is_new = await identify_user(message)
 
     # TODO: ADD usage of is_new variable
-    await message.answer(text=await get_bot_text(name='start_text_pain'))
+    await message.answer(text=(await get_bot_text(name='start_text_pain')).replace('{}', message.from_user.first_name))
     await state.set_state(StartPainState.pain_text)
 
 

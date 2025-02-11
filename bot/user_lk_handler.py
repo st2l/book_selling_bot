@@ -45,7 +45,7 @@ async def user_lk_handler(call: CallbackQuery):
 
     if q:
         ssss = await get_subscription_details(subs)
-        status = "✔ Активна до " + (subs.date_of_creation + timedelta(days=ssss.days))\
+        status = f"✔ <b>{ssss.name}</b>\nактивна до " + (subs.date_of_creation + timedelta(days=ssss.days))\
             .strftime("%d.%m.%Y")
 
         progress = "\n\n<b>Прогресс:</b>\n"

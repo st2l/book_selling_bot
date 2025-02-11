@@ -41,5 +41,5 @@ async def rate_subscription_keyboard():
         [InlineKeyboardButton(text="⭐️⭐️⭐️", callback_data="rate_3")],
         [InlineKeyboardButton(text="⭐️⭐️⭐️⭐️", callback_data="rate_4")],
         [InlineKeyboardButton(text="⭐️⭐️⭐️⭐️⭐️", callback_data="rate_5")],
-    ])
+    ][::-1])
     return keyboard

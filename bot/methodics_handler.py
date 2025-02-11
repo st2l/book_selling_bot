@@ -123,12 +123,12 @@ async def process_successful_payment(message: Message, state: FSMContext):
         
     # Запрос оценки
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(1, 6)
+        [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{methodic.id}_{i}")] for i in range(5, 0, -1)
     ])
     
     await message.bot.send_message(
         chat_id=user.id,
-        text="Пожалуйста, оцените методичку от 1 до 5 звезд:",
+        text="Пожалуйста, оцените сервис от 1 до 5 звезд:",
         reply_markup=keyboard
     )
     
