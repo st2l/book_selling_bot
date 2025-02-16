@@ -296,3 +296,18 @@ class Refer(models.Model):
 
     def __str__(self):
         return f"{self.refer_user.username} пригласил {self.invited_user.username}"
+
+
+class RatingRequest(models.Model):
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    methodic = models.ForeignKey(Methodic, verbose_name='Методичка', on_delete=models.CASCADE, null=True, blank=True)
+    short_methodic = models.ForeignKey(ShortMethodic, verbose_name='Краткая методичка', on_delete=models.CASCADE, null=True, blank=True)
+    book = models.ForeignKey(Book, verbose_name='Книга', on_delete=models.CASCADE, null=True, blank=True)
+    date_to_send = models.DateTimeField('Дата отправки')
+
+    class Meta:
+        verbose_name = 'Запрос на оценку'
+        verbose_name_plural = 'Запросы на оценку'
+
+    def __str__(self):
+        return f"{self.user.username} - {self.methodic or self.short_methodic or self.book}"

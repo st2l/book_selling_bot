@@ -96,6 +96,14 @@ async def process_successful_payment(message: Message, state: FSMContext):
 
     await check_and_process_referral(user)
 
+    from api.user.models import RatingRequest
+    from datetime import datetime, timedelta
+    await RatingRequest.objects.acreate(
+        user=user,
+        methodic=methodic,
+        date_to_send=datetime.now() + timedelta(days=7)
+    )
+
     # if ALL methodics
     if methodic_id == "Все методички":
         methodics = await sync_to_async(Methodic.objects.all, thread_sensitive=True)()

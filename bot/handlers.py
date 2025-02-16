@@ -7,6 +7,7 @@ from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandObject
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
 from api.user.models import User, Refer
 from bot.keyboard import main_menu
@@ -23,6 +24,7 @@ router = Router()
 
 
 class StartPainState(StatesGroup):
+    hello_ans = State()
     pain_text = State()
     da_ans = State()
 
@@ -49,9 +51,38 @@ async def handle_start_command(message: Message, state: FSMContext, command: Com
         except User.DoesNotExist:
             pass
 
-    # TODO: ADD usage of is_new variable
-    await message.answer(text=(await get_bot_text(name='start_text_pain')).replace('{}', message.from_user.first_name))
+    if is_new:
+        keyboard = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="ПРИВЕТ")]],
+            resize_keyboard=True,
+            one_time_keyboard=True
+        )
+
+        await message.answer(
+            text=("Привет {}!").replace('{}', message.from_user.first_name),
+            reply_markup=keyboard
+        )
+        await state.set_state(StartPainState.hello_ans)
+    else:
+        try:
+            await message.edit_text(
+                text=await get_bot_text(name='Главное меню'),
+                reply_markup=await main_menu(user)
+            )
+        except Exception as e:
+            await message.answer(
+                text=await get_bot_text(name='Главное меню'),
+                reply_markup=await main_menu(user)
+            )
+
+
+@router.message(StartPainState.hello_ans)
+async def handle_hello_ans(message: Message, state: FSMContext) -> None:
     await state.set_state(StartPainState.pain_text)
+    await message.answer(
+        text=(await get_bot_text(name='start_text_pain')).replace('{}', message.from_user.first_name),
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 
 @router.message(StartPainState.pain_text)
@@ -61,7 +92,7 @@ async def handle_pain_text(message: Message, state: FSMContext) -> None:
     await state.set_state(StartPainState.da_ans)
 
     await message.answer(
-        text=(await get_bot_text(name='Выделение боли и уточняющий вопрос')).replace('{}', pain)
+        text=(await get_bot_text(name='Выделение боли и уточняющий вопрос')).replace('{}', pain),
     )
 
 

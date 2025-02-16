@@ -15,7 +15,7 @@ from utils import get_bot_text, identify_user
 
 from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from asgiref.sync import sync_to_async
-
+from datetime import datetime, timedelta
 from bot.check_and_process_referal import check_and_process_referral
 
 book_router = Router()
@@ -67,6 +67,7 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
 def save_book_rating(user: User, rating: int):
     Rating.objects.create(user=user, rating=rating)
 
+from api.user.models import RatingRequest
 
 @book_router.message(F.successful_payment, BookState.purchase)
 async def book_payment_handler(message: Message, state: FSMContext):
@@ -92,6 +93,11 @@ async def book_payment_handler(message: Message, state: FSMContext):
         reply_markup=keyboard
     )
     
+    await RatingRequest.objects.acreate(
+        user=user,
+        book=book,
+        date_to_send=datetime.now() + timedelta(days=7)
+    )
     await state.set_state(BookState.rating)
 
 

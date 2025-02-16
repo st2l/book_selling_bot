@@ -1,6 +1,7 @@
 from api.user.models import User, Refer, SubscriptionDetails, Subscription, SubscriptionRenewal
 from asgiref.sync import sync_to_async
 import logging
+
 @sync_to_async
 def referal_bought(user: User):
     try:

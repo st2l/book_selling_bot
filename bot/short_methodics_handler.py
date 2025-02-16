@@ -93,6 +93,14 @@ async def short_methodics_payment_success(message: Message, state: FSMContext):
     user, _ = await identify_user(message)
     short_methodic = await ShortMethodic.objects.aget(id=1)
     
+    from api.user.models import RatingRequest
+    from datetime import datetime, timedelta
+    await RatingRequest.objects.acreate(
+        user=user,
+        short_methodic=short_methodic,
+        date_to_send=datetime.now() + timedelta(days=7)
+    )
+
     await check_and_process_referral(user)
     await History.objects.acreate(user=user, short_methodic=short_methodic)
 
