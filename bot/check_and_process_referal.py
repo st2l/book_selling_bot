@@ -2,6 +2,7 @@ from api.user.models import User, Refer, SubscriptionDetails, Subscription, Subs
 from asgiref.sync import sync_to_async
 import logging
 
+
 @sync_to_async
 def referal_bought(user: User):
     try:
@@ -11,6 +12,7 @@ def referal_bought(user: User):
         return referral
     except Refer.DoesNotExist:
         return None
+
 
 @sync_to_async
 def add_subscription_reward(refer: Refer):
@@ -22,13 +24,16 @@ def add_subscription_reward(refer: Refer):
             user=refer.refer_user,
             subscription_type=subs_type
         )
-        logging.info(f"User {refer.refer_user.username} is not subscribed. Giving 1 week reward.")
+        logging.info(
+            f"User {refer.refer_user.username} is not subscribed. Giving 1 week reward.")
     else:
-        logging.info(f"User {refer.refer_user.username} is already subscribed. Giving 1 week reward.")
+        logging.info(
+            f"User {refer.refer_user.username} is already subscribed. Giving 1 week reward.")
         SubscriptionRenewal.objects.create(
             user=refer.refer_user,
             subscription_type=subs_type
         )
+
 
 @sync_to_async
 def get_referrer(user: User):
@@ -36,6 +41,7 @@ def get_referrer(user: User):
         return Refer.objects.filter(invited_user=user).first()
     except Refer.DoesNotExist:
         return None
+
 
 async def check_and_process_referral(user: User):
     try:
@@ -47,8 +53,7 @@ async def check_and_process_referral(user: User):
         referral = await referal_bought(user)
 
         # Give reward to referrer
-        await add_subscription_reward(referral)
+        if referral:
+            await add_subscription_reward(referral)
     except Refer.DoesNotExist:
         pass
-
-

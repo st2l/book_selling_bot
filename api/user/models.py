@@ -9,6 +9,9 @@ class User(AbstractUser):
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
+    morning_dialog_time = models.CharField('Время утреннего диалога', max_length=5, default='10:00')
+    evening_dialog_time = models.CharField('Время вечернего диалога', max_length=5, default='22:00')
+
 
 class BotText(models.Model):
     # for bot texts
@@ -108,6 +111,7 @@ class Methodic(models.Model):
     name = models.CharField('Наименование методички', max_length=255)
     price = models.DecimalField('Цена методички', max_digits=10, decimal_places=2)
     description = models.TextField('Описание методички')
+    purchase_description = models.TextField('Описание при покупке', blank=True, null=True)
     material = models.FileField(upload_to="methodics/")
 
     class Meta:
@@ -124,6 +128,7 @@ class ShortMethodic(models.Model):
     name = models.CharField('Наименование краткой методички', max_length=255)
     price = models.DecimalField('Цена краткой методички', max_digits=10, decimal_places=2)
     description = models.TextField('Описание краткой методички')
+    purchase_description = models.TextField('Описание при покупке', blank=True, null=True)
     material = models.FileField(upload_to="short_methodics/", null=True)
 
     class Meta:
@@ -140,6 +145,7 @@ class Book(models.Model):
     name = models.CharField('Наименование книги', max_length=255)
     price = models.DecimalField('Цена книги', max_digits=10, decimal_places=2)
     description = models.TextField('Описание книги')
+    purchase_description = models.TextField('Описание при покупке', blank=True, null=True)
     material = models.FileField(upload_to="books/")
 
     class Meta:

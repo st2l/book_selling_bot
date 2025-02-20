@@ -59,13 +59,13 @@ async def short_methodics_yookassa(call: CallbackQuery, state: FSMContext):
 
     await call.bot.send_invoice(
         chat_id=call.from_user.id,
-        title='Краткая методичка',
-        description='Покупка краткой методички',
+        title=short_methodic.name,
+        description=short_methodic.purchase_description or short_methodic.description,  # Use purchase_description if available
         payload='bot_paid',
         provider_token=os.getenv('YOOKASSA_TOKEN'),
         currency='RUB',
-        prices=[LabeledPrice(label='Оплата краткой методички',
-                             amount=short_methodic.price * 100)],
+        prices=[LabeledPrice(label=short_methodic.name,
+                           amount=short_methodic.price * 100)],
         need_email=True,
         send_email_to_provider=True,
     )

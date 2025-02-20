@@ -10,6 +10,8 @@ async def user_lk_keyboard(user: User, subs: Subscription | None) -> InlineKeybo
             [InlineKeyboardButton(text="🔄 Продлить подписку", callback_data="renew_subscription")],
             [InlineKeyboardButton(text="⏰ Изменить напоминания",
                                   callback_data="notifications_settings")],
+            [InlineKeyboardButton(text="⏰ Время диалогов",
+                                  callback_data="dialog_time_settings")],
             [InlineKeyboardButton(
                 text="Изменить интересующие темы", callback_data="change_theme")],
             [InlineKeyboardButton(text="🔁 История покупок",

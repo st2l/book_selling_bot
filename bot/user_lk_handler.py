@@ -15,7 +15,7 @@ from bot.keyboard import user_lk_keyboard, history_keyboard, back_to_main_keyboa
 
 from utils import get_bot_text, identify_user
 
-from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile, InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 import re
 
@@ -362,3 +362,89 @@ async def delete_notification_handler(call: CallbackQuery):
     )
 
     await call.answer()
+
+
+class DialogTimeStates(StatesGroup):
+    morning_time = State()
+    evening_time = State()
+
+
+@user_lk_router.callback_query(F.data == 'dialog_time_settings')
+async def dialog_time_settings_handler(call: CallbackQuery):
+    user, is_new = await identify_user(call)
+    await call.message.edit_text(
+        text=f"⏰ Текущее время диалогов:\nУтро: {user.morning_dialog_time}\nВечер: {user.evening_dialog_time}\n\nВыберите действие:",
+        reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="Изменить утреннее время", callback_data="change_morning_time")],
+            [InlineKeyboardButton(
+                text="Изменить вечернее время", callback_data="change_evening_time")],
+            [InlineKeyboardButton(text="◀️ Назад", callback_data="user_lk")]
+        ])
+    )
+
+
+@sync_to_async()
+def get_subscription(user: User):
+    try:
+        return Subscription.objects.get(user=user)
+    except Subscription.DoesNotExist:
+        return None
+
+
+@user_lk_router.callback_query(F.data == 'change_morning_time')
+async def change_morning_time_handler(call: CallbackQuery, state: FSMContext):
+    await state.set_state(DialogTimeStates.morning_time)
+    await call.message.edit_text(
+        "Введите время для утреннего диалога в формате ЧЧ:ММ (по МСК):"
+    )
+
+
+@user_lk_router.message(DialogTimeStates.morning_time)
+async def set_morning_time_handler(message: Message, state: FSMContext):
+    time_pattern = re.compile(r'^\d{2}:\d{2}$')
+    if not time_pattern.match(message.text):
+        await message.answer("Неверный формат времени. Пожалуйста, используйте формат ЧЧ:ММ")
+        return
+
+    hours, minutes = map(int, message.text.split(':'))
+    if not (0 <= hours < 24 and 0 <= minutes < 60):
+        await message.answer("Неверное время. Часы должны быть от 00 до 23, а минуты от 00 до 59.")
+        return
+
+    user, is_new = await identify_user(message)
+    user.morning_dialog_time = f"{hours:02d}:{minutes:02d}"
+    await user.asave()
+
+    await message.answer("Время утреннего диалога успешно изменено!",
+                         reply_markup=await user_lk_keyboard(user, await get_subscription(user)))
+    await state.clear()
+
+
+@user_lk_router.callback_query(F.data == 'change_evening_time')
+async def change_evening_time_handler(call: CallbackQuery, state: FSMContext):
+    await state.set_state(DialogTimeStates.evening_time)
+    await call.message.edit_text(
+        "Введите время для вечернего диалога в формате ЧЧ:ММ (по МСК):"
+    )
+
+
+@user_lk_router.message(DialogTimeStates.evening_time)
+async def set_evening_time_handler(message: Message, state: FSMContext):
+    time_pattern = re.compile(r'^\d{2}:\d{2}$')
+    if not time_pattern.match(message.text):
+        await message.answer("Неверный формат времени. Пожалуйста, используйте формат ЧЧ:ММ")
+        return
+
+    hours, minutes = map(int, message.text.split(':'))
+    if not (0 <= hours < 24 and 0 <= minutes < 60):
+        await message.answer("Неверное время. Часы должны быть от 00 до 23, а минуты от 00 до 59.")
+        return
+
+    user, is_new = await identify_user(message)
+    user.evening_dialog_time = f"{hours:02d}:{minutes:02d}"
+    await user.asave()
+
+    await message.answer("Время вечернего диалога успешно изменено!",
+                         reply_markup=await user_lk_keyboard(user, await get_subscription(user)))
+    await state.clear()

@@ -48,7 +48,7 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
     await call.bot.send_invoice(
         chat_id=call.from_user.id,
         title=book.name,
-        description=book.description,
+        description=book.purchase_description or book.description,  # Use purchase_description if available
         payload='bot_paid',
         provider_token=os.getenv('YOOKASSA_TOKEN'),
         currency='RUB',

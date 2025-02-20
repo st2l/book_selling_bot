@@ -46,7 +46,7 @@ async def methodics_handler(call: CallbackQuery):
 async def methodic_1_handler(call: CallbackQuery):
     user = await identify_user(call)
 
-    methodic = await Methodic.objects.aget(name='Методичка 1')
+    methodic = await Methodic.objects.aget(id=1)
 
     await call.message.edit_text(
         text=methodic.description,
@@ -58,16 +58,14 @@ async def methodic_1_handler(call: CallbackQuery):
 
 @methodics_router.callback_query(F.data == "methodic_1_purchase")
 async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
-
     await call.answer()
-
     methodic = await Methodic.objects.aget(id=1)
     logging.info(f"Methodic: {methodic}")
 
     await call.bot.send_invoice(
         chat_id=call.from_user.id,
         title=methodic.name,
-        description='Покупка методички №1',
+        description=methodic.purchase_description or methodic.description,  # Используем purchase_description если есть
         payload='bot_paid',
         provider_token=os.getenv('YOOKASSA_TOKEN'),
         currency='RUB',
@@ -173,16 +171,14 @@ async def methodic_1_handler(call: CallbackQuery):
 
 @methodics_router.callback_query(F.data == "methodic_2_purchase")
 async def methodic_2_purchase(call: CallbackQuery, state: FSMContext):
-
     await call.answer()
-
     methodic = await Methodic.objects.aget(id=2)
     logging.info(f"Methodic: {methodic}")
 
     await call.bot.send_invoice(
         chat_id=call.from_user.id,
         title=methodic.name,
-        description='Покупка методички №2',
+        description=methodic.purchase_description or methodic.description,  # Используем purchase_description если есть
         payload='bot_paid',
         provider_token=os.getenv('YOOKASSA_TOKEN'),
         currency='RUB',
@@ -217,16 +213,14 @@ async def methodic_3_handler(call: CallbackQuery):
 
 @methodics_router.callback_query(F.data == "methodic_3_purchase")
 async def methodic_1_purchase(call: CallbackQuery, state: FSMContext):
-
     await call.answer()
-
     methodic = await Methodic.objects.aget(id=3)
     logging.info(f"Methodic: {methodic}")
 
     await call.bot.send_invoice(
         chat_id=call.from_user.id,
         title=methodic.name,
-        description='Покупка методички №3',
+        description=methodic.purchase_description or methodic.description,  # Используем purchase_description если есть
         payload='bot_paid',
         provider_token=os.getenv('YOOKASSA_TOKEN'),
         currency='RUB',
