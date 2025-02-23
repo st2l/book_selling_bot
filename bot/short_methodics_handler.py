@@ -57,7 +57,7 @@ async def short_methodics_yookassa(call: CallbackQuery, state: FSMContext):
     short_methodic = await ShortMethodic.objects.aget(id=1)
     logging.info(f"Short methodic: {short_methodic}")
 
-    await call.bot.send_invoice(
+    msg = await call.bot.send_invoice(
         chat_id=call.from_user.id,
         title=short_methodic.name,
         description=short_methodic.purchase_description or short_methodic.description,  # Use purchase_description if available
@@ -69,7 +69,7 @@ async def short_methodics_yookassa(call: CallbackQuery, state: FSMContext):
         need_email=True,
         send_email_to_provider=True,
     )
-
+    await state.update_data(msg=msg)
     await state.set_state(ShortMethodicsStates.short_methodics_yookassa)
 
 
@@ -92,6 +92,18 @@ def save_rating(user: User, rating: int):
 async def short_methodics_payment_success(message: Message, state: FSMContext):
     user, _ = await identify_user(message)
     short_methodic = await ShortMethodic.objects.aget(id=1)
+
+    data = await state.get_data()
+    msg = data.get('msg')
+    await state.clear()
+
+    try:
+        await message.bot.delete_message(
+            chat_id=message.chat.id,
+            message_id=msg.message_id
+        )
+    except Exception as e:
+        logging.error(f"Error while deleting message: {e}")
     
     from api.user.models import RatingRequest
     from datetime import datetime, timedelta

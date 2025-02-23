@@ -1,4 +1,5 @@
 from __future__ import annotations
+from api.user.models import RatingRequest
 
 from typing import TYPE_CHECKING
 import os
@@ -45,10 +46,11 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
     book = await Book.objects.aget(id=1)
     await state.set_state(BookState.purchase)
 
-    await call.bot.send_invoice(
+    msg = await call.bot.send_invoice(
         chat_id=call.from_user.id,
         title=book.name,
-        description=book.purchase_description or book.description,  # Use purchase_description if available
+        # Use purchase_description if available
+        description=book.purchase_description or book.description,
         payload='bot_paid',
         provider_token=os.getenv('YOOKASSA_TOKEN'),
         currency='RUB',
@@ -59,6 +61,7 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
         send_email_to_provider=True,
         start_parameter='create_invoice',
     )
+    await state.update_data(msg=msg)
 
     await call.answer()
 
@@ -67,13 +70,22 @@ async def book_purchase_handler(call: CallbackQuery, state: FSMContext):
 def save_book_rating(user: User, rating: int):
     Rating.objects.create(user=user, rating=rating)
 
-from api.user.models import RatingRequest
 
 @book_router.message(F.successful_payment, BookState.purchase)
 async def book_payment_handler(message: Message, state: FSMContext):
     user, _ = await identify_user(message)
     book = await Book.objects.aget(id=1)
+    data = await state.get_data()
+    msg = data.get('msg')
     await state.clear()
+
+    try:
+        await message.bot.delete_message(
+            chat_id=message.chat.id,
+            message_id=msg.message_id
+        )
+    except Exception as e:
+        logging.error(f"Error while deleting message: {e}")
 
     await check_and_process_referral(user)
     history = await History.objects.acreate(user=user, book=book)
@@ -82,22 +94,20 @@ async def book_payment_handler(message: Message, state: FSMContext):
         caption=await get_bot_text(name='Успешная покупка книги'),
         document=FSInputFile(book.material.path),
     )
-    
+
     # Ask for rating
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⭐" * i, callback_data=f"rate_{i}")] for i in range(5, 0, -1)
     ])
-    
+
     await message.answer(
         text="Пожалуйста, оцените сервис от 1 до 5 звезд:",
         reply_markup=keyboard
     )
-    
+
     await RatingRequest.objects.acreate(
         user=user,
         book=book,
         date_to_send=datetime.now() + timedelta(days=7)
     )
     await state.set_state(BookState.rating)
-
-
