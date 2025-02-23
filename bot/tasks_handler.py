@@ -51,7 +51,7 @@ async def chapter_handler(call: CallbackQuery):
         chunks = [task.text[i:i + 4000] for i in range(0, len(task.text), 4000)]
         for idx, chunk in enumerate(chunks):
             if idx == len(chunks) - 1:
-                await call.message.edit_text(
+                await call.message.answer(
                     text=chunk,
                     reply_markup=await chapter_keyboard(user, task)
                 )
