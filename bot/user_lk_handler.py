@@ -58,7 +58,7 @@ async def user_lk_handler(call: CallbackQuery):
                     progress += f"Глава {i}: ❌\n"
         elif ssss.id == 2:
             for i in range(1, 6):
-                history = await get_history
+                history = await get_history(user, i)
                 if history:
                     progress += f"Глава {i}: ✅\n"
                 else:
