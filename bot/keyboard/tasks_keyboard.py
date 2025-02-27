@@ -33,35 +33,22 @@ async def choose_tasks_keyboard(user: User):
     """Generate choose tasks keyboard."""
 
     days_passed = await get_days_from_the_start_of_subscription(user)
-    subs_type_id = await get_subscryption_type_id(user)
-    if days_passed < 7:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 1) else '❌')
-                                  + ' Глава 1', callback_data='chapter_1')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 2) else '❌') + ' Глава 2', callback_data='chapter_2')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 3) else '❌') + ' Глава 3', callback_data='chapter_3')],
-            [InlineKeyboardButton(text='◀️ Назад', callback_data='main_menu')],
-        ])
-    elif days_passed < 30:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 1) else '❌') + ' Глава 1', callback_data='chapter_1')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 2) else '❌') + ' Глава 2', callback_data='chapter_2')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 3) else '❌') + ' Глава 3', callback_data='chapter_3')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 4) else '❌') + ' Глава 4', callback_data='chapter_4')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 5) else '❌') + ' Глава 5', callback_data='chapter_5')],
-            [InlineKeyboardButton(text='◀️ Назад', callback_data='main_menu')],
-        ])
-    elif days_passed < 90:
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 1) else '❌') + ' Глава 1', callback_data='chapter_1')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 2) else '❌') + ' Глава 2', callback_data='chapter_2')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 3) else '❌') + ' Глава 3', callback_data='chapter_3')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 4) else '❌') + ' Глава 4', callback_data='chapter_4')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 5) else '❌') + ' Глава 5', callback_data='chapter_5')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 6) else '❌') + ' Глава 6', callback_data='chapter_6')],
-            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, 7) else '❌') + ' Глава 7', callback_data='chapter_7')],
-            [InlineKeyboardButton(text='◀️ Назад', callback_data='main_menu')],
-        ])
+    # Calculate number of weeks (rounding up)
+    weeks_passed = (days_passed + 6) // 7  # Adding 6 to round up division
+    
+    # Create a list of keyboard buttons based on weeks passed
+    keyboard_buttons = []
+    for chapter in range(1, weeks_passed + 1):
+        keyboard_buttons.append(
+            [InlineKeyboardButton(text=('✔' if await get_solved_task_by_user_n_chapter(user, chapter) else '❌') + 
+                                  f' Глава {chapter}', callback_data=f'chapter_{chapter}')]
+        )
+    
+    # Add back button
+    keyboard_buttons.append([InlineKeyboardButton(text='◀️ Назад', callback_data='main_menu')])
+    
+    # Create keyboard with generated buttons
+    keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard_buttons)
 
     return keyboard
 
