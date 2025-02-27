@@ -40,7 +40,7 @@ def get_faq_keyboard(questions, current_page: int = 0, items_per_page: int = 5):
     if nav_buttons:
         kb.row(*nav_buttons)  # Add navigation buttons in one row
     
-    kb.button(InlineKeyboardButton(text='🔙 Назад', callback_data='main_menu'))
+    kb.button(text='🔙 Назад', callback_data='main_menu')
     kb.adjust(1)  # One question per row
 
     return kb.as_markup()
