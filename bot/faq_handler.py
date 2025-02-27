@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from asgiref.sync import sync_to_async
+from utils import get_bot_text
 
 from api.user.models import FAQQuestion
 
@@ -25,7 +26,7 @@ async def faq_start(callback: types.CallbackQuery, state: FSMContext):
     kb.button(text='◀️ Назад', callback_data='main_menu')
     kb.adjust(1)  # One button per row
     
-    await callback.message.edit_text("Выберите вопрос:", reply_markup=kb.as_markup())
+    await callback.message.edit_text(await get_bot_text('Текст для FAQ'), reply_markup=kb.as_markup())
 
 @faq_router.callback_query(F.data.startswith('faq_question'))
 async def faq_question_selected(callback: types.CallbackQuery):
@@ -57,6 +58,6 @@ async def faq_menu(callback: types.CallbackQuery):
     kb.button(text='◀️ Назад', callback_data='main_menu')
     kb.adjust(1)  # One button per row
     
-    await callback.message.edit_text("Выберите вопрос:", reply_markup=kb.as_markup())
+    await callback.message.edit_text(await get_bot_text('Текст для FAQ'), reply_markup=kb.as_markup())
 
 
