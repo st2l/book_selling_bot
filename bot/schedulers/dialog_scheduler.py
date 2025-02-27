@@ -26,7 +26,7 @@ def get_dialog_task(day_number: int, time_of_day: str):
 async def send_dialog_task(user, task):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(
-            text="Дать ответ", callback_data=f"dialog_answer_{task.id}")]
+            text="Записать ответ", callback_data=f"dialog_answer_{task.id}")]
     ])
 
     await bot.send_message(

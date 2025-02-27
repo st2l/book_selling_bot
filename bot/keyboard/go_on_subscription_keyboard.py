@@ -29,7 +29,7 @@ async def subscription_purchased_keyboard():
 
 async def theme_chosen_keyboard():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="⏰ Поставить напоминания", callback_data="notifications_settings")],
+        [InlineKeyboardButton(text="⏰ Поставить напоминания", callback_data="dialog_time_settings")],
         [InlineKeyboardButton(text="⏭ Оставить отзыв", callback_data="rate_subscription")],
     ])
     return keyboard
