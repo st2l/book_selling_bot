@@ -15,7 +15,7 @@ def get_all_faq_questions():
 @faq_router.callback_query(F.data == 'faq')
 async def faq_start(message: types.Message, state: FSMContext):
     """Display the list of FAQ questions."""
-    await state.finish()
+    await state.clear()
     questions = await get_all_faq_questions()
     keyboard = InlineKeyboardMarkup(row_width=1)
     for question in questions:
