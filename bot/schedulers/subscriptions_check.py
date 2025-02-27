@@ -4,6 +4,7 @@ from asgiref.sync import sync_to_async
 from api.user.models import Subscription, SubscriptionDetails, User, Notification, Theme, DialogResponse, SubscriptionRenewal
 from bot.bot_instance import bot
 import logging
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 import pytz
 import os
 from aiogram.types import FSInputFile
@@ -89,7 +90,8 @@ async def check_and_notify_subscriptions():
             logging.info('User has been already notificated!')
 
         if days_left == 2 and (user.username not in sended):
-            await bot.send_message(chat_id=user.username, text="Ваша подписка заканчивается через 2 дня.")
+            await bot.send_message(chat_id=user.username, text="Ваша подписка заканчивается через 2 дня.",
+                                   reply_markup=InlineKeyboardBuilder().button(text="Продлить подписку", callback_data="renew_subscription").as_markup())
             sended.add(user.username)
         elif days_left <= 0:
             sended.remove(user.username)
@@ -118,7 +120,8 @@ async def check_and_notify_subscriptions():
                 filepath = await save_responses_to_file(formatted_text, user.username)
                 
                 # Send end subscription message and responses file
-                await bot.send_message(chat_id=user.username, text="Ваша подписка закончилась.")
+                await bot.send_message(chat_id=user.username, text="Ваша подписка закончилась.",
+                                       reply_markup=InlineKeyboardBuilder().button(text="Продлить подписку", callback_data="renew_subscription").as_markup())
                 await bot.send_document(
                     chat_id=user.username,
                     document=FSInputFile(filepath),
