@@ -17,11 +17,12 @@ async def go_on_subscription_keyboard():
     )
     return keyboard
 
+from api.user.models import SubscriptionDetails
 
-async def subscription_purchased_keyboard():
+async def subscription_purchased_keyboard(subs: SubscriptionDetails):
 
     arr = []
-    async for el in ThemePool.objects.all():
+    async for el in ThemePool.objects.all()[:subs.id]:
         arr.append([InlineKeyboardButton(text=el.name, callback_data=f"theme_{el.id}")])
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=arr)
