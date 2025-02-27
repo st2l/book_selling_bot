@@ -18,12 +18,22 @@ async def go_on_subscription_keyboard():
     return keyboard
 
 from api.user.models import SubscriptionDetails
+from asgiref.sync import sync_to_async
+
+@sync_to_async()
+def get_all_themes_sorted():
+    return ThemePool.objects.all().order_by('id')
 
 async def subscription_purchased_keyboard(subs: SubscriptionDetails):
 
     arr = []
-    async for el in ThemePool.objects.all()[:subs.id]:
-        arr.append([InlineKeyboardButton(text=el.name, callback_data=f"theme_{el.id}")])
+    th = await get_all_themes_sorted()
+    try:
+        async for el in th[:subs.id]:
+            arr.append([InlineKeyboardButton(text=el.name, callback_data=f"theme_{el.id}")])
+    except Exception as e:
+        for el in th[:subs.id]:
+            arr.append([InlineKeyboardButton(text=el.name, callback_data=f"theme_{el.id}")])
 
     keyboard = InlineKeyboardMarkup(inline_keyboard=arr)
     return keyboard
