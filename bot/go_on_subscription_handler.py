@@ -125,7 +125,7 @@ async def subsription_purchased(message: Message, state: FSMContext):
 
     await message.answer(
         text=await get_bot_text('Подписка успешно оформлена'),
-        reply_markup=await subscription_purchased_keyboard(),
+        reply_markup=await subscription_purchased_keyboard(subs=subs),
     )
     await state.clear()
 
