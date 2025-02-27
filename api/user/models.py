@@ -317,3 +317,15 @@ class RatingRequest(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.methodic or self.short_methodic or self.book}"
+
+
+class FAQQuestion(models.Model):
+    question = models.CharField('Вопрос', max_length=255)
+    answer = models.TextField('Ответ')
+
+    class Meta:
+        verbose_name = 'Вопрос FAQ'
+        verbose_name_plural = 'Вопросы FAQ'
+
+    def __str__(self):
+        return self.question

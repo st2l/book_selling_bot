@@ -23,6 +23,7 @@ from bot.admin import admin_router
 from bot.dialog_handler import dialog_router
 from bot.like_minded_chat_handler import like_minded_chat_router
 from bot.referral_handler import referral_router
+from bot.faq_handler import faq_router
 
 # FOR INITIAL CREATION OF DATABASE
 from asgiref.sync import sync_to_async
@@ -51,6 +52,8 @@ dispatcher.include_router(admin_router)
 dispatcher.include_router(dialog_router)
 dispatcher.include_router(like_minded_chat_router)
 dispatcher.include_router(referral_router)
+dispatcher.include_router(faq_router)
+
 async def set_bot_commands() -> None:
     await bot.set_my_commands(
         [

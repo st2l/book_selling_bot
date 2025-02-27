@@ -14,7 +14,7 @@ from bot.keyboard import choose_three_methodics_keyboard, methodic_1_keyboard, \
 
 from utils import get_bot_text, identify_user
 
-from aiogram.types import Message, CallbackQuery, LabeledPrice, PreCheckoutQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from asgiref.sync import sync_to_async
 
 help_router = Router()
@@ -26,7 +26,12 @@ async def help_handler(call: CallbackQuery):
 
     await call.message.edit_text(
         text=await get_bot_text(name='Помощь'),
-        reply_markup=await back_to_main_keyboard()
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [InlineKeyboardButton(text='FAQ', callback_data='faq')],
+                [InlineKeyboardButton(text='◀️ Назад', callback_data='main_menu')]
+            ]
+        )
     )
 
     await call.answer()
