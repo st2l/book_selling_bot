@@ -41,7 +41,7 @@ def get_faq_keyboard(questions, current_page: int = 0, items_per_page: int = 5):
     if nav_buttons:
         kb.row(*nav_buttons)  # Add navigation buttons in one row
     
-    kb.row(InlineKeyboardButton(text='🔙 Назад', callback_data='main_menu'))
+    kb.row([InlineKeyboardButton(text='🔙 Назад', callback_data='main_menu')])
     return kb.as_markup()
 
 @faq_router.callback_query(F.data == 'faq')
