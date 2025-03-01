@@ -25,7 +25,10 @@ def get_faq_keyboard(questions, current_page: int = 0, items_per_page: int = 5):
     
     # Add question buttons for current page
     for question in questions[start_idx:end_idx]:
-        kb.button(text=question.question, callback_data=f'faq_question_{question.id}')
+        kb.button(
+            text=question.question,
+            callback_data=f'faq_question_{question.id}_{current_page}'
+        )
     
     # Add navigation buttons
     nav_buttons = []
@@ -38,10 +41,10 @@ def get_faq_keyboard(questions, current_page: int = 0, items_per_page: int = 5):
             text="➡️", callback_data=f'faq_page_{current_page+1}'))
     
     if nav_buttons:
-        kb.row(*nav_buttons)  # Add navigation buttons in one row
+        kb.row(*nav_buttons)
     
     kb.button(text='🔙 Назад', callback_data='main_menu')
-    kb.adjust(1)  # One question per row
+    kb.adjust(1)
 
     return kb.as_markup()
 
@@ -70,7 +73,10 @@ async def faq_page(callback: types.CallbackQuery):
 @faq_router.callback_query(F.data.startswith('faq_question'))
 async def faq_question_selected(callback: types.CallbackQuery):
     """Display the answer to the selected question."""
-    question_id = int(callback.data.split('_')[-1])
+    # Parse both question_id and page_number from callback data
+    _, _, question_id, page_number = callback.data.split('_')
+    question_id = int(question_id)
+    page_number = int(page_number)
 
     @sync_to_async
     def get_faq_question(question_id):
@@ -78,7 +84,8 @@ async def faq_question_selected(callback: types.CallbackQuery):
 
     question = await get_faq_question(question_id)
     kb = InlineKeyboardBuilder()
-    kb.button(text='◀️ Назад к вопросам', callback_data='faq')
+    # Include the page number in the back button
+    kb.button(text='◀️ Назад к вопросам', callback_data=f'faq_page_{page_number}')
     
     await callback.message.edit_text(
         f"<b>{question.question}</b>\n\n{question.answer}",
